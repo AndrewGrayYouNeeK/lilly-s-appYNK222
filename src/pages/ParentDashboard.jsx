@@ -5,7 +5,7 @@ import { base44 } from '@/api/base44Client';
 import Shell from '@/components/Shell';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Copy, CheckSquare, TrendingUp, Users, Plus, BarChart3, Medal, Baby } from 'lucide-react';
+import { Copy, CheckSquare, TrendingUp, Users, Plus, BarChart3, Medal, Baby, Sparkles } from 'lucide-react';
 import { formatMoney } from '@/lib/cq';
 import { toast } from 'sonner';
 
@@ -66,6 +66,17 @@ export default function ParentDashboard() {
         <Stat icon={Users} label="Kids" value={kids.length} tone="primary" />
         <Stat icon={TrendingUp} label="This week" value={formatMoney(thisWeek.reduce((s,c)=>s+(c.paid_amount||0),0), family?.currency_symbol)} tone="secondary" onClick={() => nav('/parent/reports')} />
       </div>
+
+      {/* Coach CTA */}
+      <Card onClick={() => nav('/parent/coach')} className="p-4 mb-3 cursor-pointer bounce-tap bg-gradient-to-br from-secondary/20 to-accent/30 border-secondary/30 flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+          <Sparkles className="w-5 h-5 text-primary-foreground" />
+        </div>
+        <div className="flex-1">
+          <div className="font-display font-bold leading-tight">Ask the Chore Coach</div>
+          <div className="text-xs text-muted-foreground">Plan chores, get advice, analyze activity</div>
+        </div>
+      </Card>
 
       {/* Quick links */}
       <div className="grid grid-cols-3 gap-2 mb-5">
