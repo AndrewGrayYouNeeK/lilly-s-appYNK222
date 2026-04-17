@@ -1,0 +1,44 @@
+{
+  "name": "FamilyQuest",
+  "type": "object",
+  "properties": {
+    "family_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "emoji": {
+      "type": "string",
+      "default": "\ud83c\udfc6"
+    },
+    "target_count": {
+      "type": "number",
+      "description": "Total chores everyone needs to complete"
+    },
+    "reward": {
+      "type": "string",
+      "description": "e.g. Family movie night"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "completed"
+      ],
+      "default": "active"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "family_id",
+    "title",
+    "target_count"
+  ]
+}

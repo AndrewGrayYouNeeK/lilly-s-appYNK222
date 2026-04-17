@@ -1,15 +1,19 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, ListChecks, CheckSquare, Home, Wallet, Flame } from 'lucide-react';
+import { LayoutDashboard, ListChecks, CheckSquare, Home, Wallet, Flame, Trophy, ShoppingBag, Gift, Medal } from 'lucide-react';
 
 const parentTabs = [
   { to: '/parent', icon: LayoutDashboard, label: 'Home' },
   { to: '/parent/chores', icon: ListChecks, label: 'Chores' },
   { to: '/parent/approvals', icon: CheckSquare, label: 'Approve' },
+  { to: '/parent/quests', icon: Trophy, label: 'Quests' },
+  { to: '/parent/shop', icon: Gift, label: 'Shop' },
 ];
 const kidTabs = [
   { to: '/kid', icon: Home, label: 'Home' },
   { to: '/kid/pool', icon: Flame, label: 'Quests' },
+  { to: '/kid/badges', icon: Medal, label: 'Badges' },
+  { to: '/kid/shop', icon: ShoppingBag, label: 'Shop' },
   { to: '/kid/wallet', icon: Wallet, label: 'Wallet' },
 ];
 

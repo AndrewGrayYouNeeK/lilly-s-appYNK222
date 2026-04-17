@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Check, RefreshCcw, Inbox } from 'lucide-react';
 import { formatMoney, todayISO, streakMultiplier } from '@/lib/cq';
+import { checkAndAwardBadges, checkFamilyQuests } from '@/lib/gamification';
 import { toast } from 'sonner';
 
 export default function ParentApprovals() {
@@ -67,8 +68,18 @@ export default function ParentApprovals() {
           amount: bonus, type: 'bonus', description: `Streak bonus (${newCount} days 🔥)`, claim_id: claim.id,
         });
       }
+
+      // Award badges + check family quests
+      const newBadges = await checkAndAwardBadges({ kidEmail: claim.kid_email, familyId: claim.family_id });
+      await checkFamilyQuests(claim.family_id);
+      return { newBadges };
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['pending'] }); qc.invalidateQueries({ queryKey: ['claims'] }); toast.success('Approved & paid!'); },
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ['pending'] });
+      qc.invalidateQueries({ queryKey: ['claims'] });
+      const extra = res?.newBadges?.length ? ` · ${res.newBadges.length} new badge${res.newBadges.length>1?'s':''}!` : '';
+      toast.success(`Approved & paid!${extra}`);
+    },
   });
 
   const redo = useMutation({

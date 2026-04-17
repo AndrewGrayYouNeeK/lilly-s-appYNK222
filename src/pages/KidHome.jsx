@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import Shell from '@/components/Shell';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import AvatarRing from '@/components/AvatarRing';
+import { Progress } from '@/components/ui/progress';
 import { Wallet, Flame, Trophy, ChevronRight } from 'lucide-react';
 import { formatMoney, streakMultiplier, todayISO } from '@/lib/cq';
 
@@ -31,6 +32,16 @@ export default function KidHome() {
     queryFn: () => base44.entities.ChoreClaim.filter({ kid_email: me.email }, '-created_date'),
     enabled: !!me?.email,
   });
+  const { data: familyQuests = [] } = useQuery({
+    queryKey: ['quests', me?.family_id],
+    queryFn: () => base44.entities.FamilyQuest.filter({ family_id: me.family_id, status: 'active' }),
+    enabled: !!me?.family_id,
+  });
+  const { data: familyApproved = [] } = useQuery({
+    queryKey: ['familyApproved', me?.family_id],
+    queryFn: () => base44.entities.ChoreClaim.filter({ family_id: me.family_id, status: 'approved' }),
+    enabled: !!me?.family_id,
+  });
 
   const balance = txs.reduce((s, t) => s + (['earn','bonus'].includes(t.type) ? t.amount : -t.amount), 0);
   const count = streak?.current_count || 0;
@@ -40,15 +51,15 @@ export default function KidHome() {
   const submittedToday = myClaims.filter(c => (c.claim_date || '').startsWith(today) && c.status === 'submitted');
 
   const flameSize = count >= 14 ? 'text-7xl' : count >= 7 ? 'text-6xl' : count >= 3 ? 'text-5xl' : 'text-4xl';
+  const approvedCount = myClaims.filter(c => c.status === 'approved').length;
+  const activeQuest2 = familyQuests[0];
 
   return (
     <Shell role="kid">
-      <header className="flex items-center gap-4 mb-5">
-        <div className="text-5xl">{me?.avatar_emoji || '🦊'}</div>
-        <div className="flex-1">
-          <div className="text-xs text-muted-foreground">Hey there</div>
-          <h1 className="font-display text-2xl font-bold">{me?.display_name || me?.full_name}</h1>
-        </div>
+      <header className="mb-5">
+        <div className="text-xs text-muted-foreground mb-1">Hey there</div>
+        <h1 className="font-display text-2xl font-bold mb-4">{me?.display_name || me?.full_name}</h1>
+        <AvatarRing emoji={me?.avatar_emoji || '🦊'} completedCount={approvedCount} size={88} />
       </header>
 
       {/* Streak hero */}
@@ -110,6 +121,28 @@ export default function KidHome() {
           </div>
         </Card>
       )}
+
+      {activeQuest2 && (() => {
+        const since = new Date(activeQuest2.created_date);
+        const prog = familyApproved.filter(c => new Date(c.created_date) >= since).length;
+        const pct = Math.min(100, (prog / activeQuest2.target_count) * 100);
+        return (
+          <Card className="p-4 mb-4">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="text-2xl">{activeQuest2.emoji}</div>
+              <div className="flex-1">
+                <div className="text-xs text-muted-foreground uppercase tracking-wide">Family Quest</div>
+                <div className="font-display font-bold leading-tight">{activeQuest2.title}</div>
+              </div>
+            </div>
+            <Progress value={pct} className="h-2" />
+            <div className="text-xs text-muted-foreground mt-1.5 flex justify-between">
+              <span>{prog} / {activeQuest2.target_count} chores</span>
+              {activeQuest2.reward && <span className="font-semibold">🎁 {activeQuest2.reward}</span>}
+            </div>
+          </Card>
+        );
+      })()}
     </Shell>
   );
 }

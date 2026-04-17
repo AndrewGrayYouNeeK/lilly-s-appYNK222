@@ -1,0 +1,41 @@
+{
+  "name": "Purchase",
+  "type": "object",
+  "properties": {
+    "family_id": {
+      "type": "string"
+    },
+    "kid_email": {
+      "type": "string"
+    },
+    "kid_name": {
+      "type": "string"
+    },
+    "item_id": {
+      "type": "string"
+    },
+    "item_title": {
+      "type": "string"
+    },
+    "item_emoji": {
+      "type": "string"
+    },
+    "price": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "fulfilled"
+      ],
+      "default": "pending"
+    }
+  },
+  "required": [
+    "family_id",
+    "kid_email",
+    "item_id",
+    "price"
+  ]
+}

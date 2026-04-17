@@ -2,6 +2,13 @@
 module.exports = {
     darkMode: ["class"],
     content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
+    safelist: [
+      'stroke-muted-foreground','stroke-success','stroke-accent','stroke-secondary','stroke-primary',
+      'bg-orange-100','text-orange-700','ring-orange-300',
+      'bg-slate-100','text-slate-700','ring-slate-300',
+      'bg-amber-100','text-amber-700','ring-amber-300',
+      'bg-purple-100','text-purple-700','ring-purple-300',
+    ],
   theme: {
   	extend: {
   		borderRadius: {

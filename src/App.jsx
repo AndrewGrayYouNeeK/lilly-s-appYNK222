@@ -12,10 +12,14 @@ import Onboarding from '@/pages/Onboarding';
 import ParentDashboard from '@/pages/ParentDashboard';
 import ParentChores from '@/pages/ParentChores';
 import ParentApprovals from '@/pages/ParentApprovals';
+import ParentQuests from '@/pages/ParentQuests';
+import ParentShop from '@/pages/ParentShop';
 import KidHome from '@/pages/KidHome';
 import ChorePool from '@/pages/ChorePool';
 import ChoreDo from '@/pages/ChoreDo';
 import KidWallet from '@/pages/KidWallet';
+import KidBadges from '@/pages/KidBadges';
+import KidShop from '@/pages/KidShop';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -40,10 +44,14 @@ const AuthenticatedApp = () => {
       <Route path="/parent" element={<ParentDashboard />} />
       <Route path="/parent/chores" element={<ParentChores />} />
       <Route path="/parent/approvals" element={<ParentApprovals />} />
+      <Route path="/parent/quests" element={<ParentQuests />} />
+      <Route path="/parent/shop" element={<ParentShop />} />
       <Route path="/kid" element={<KidHome />} />
       <Route path="/kid/pool" element={<ChorePool />} />
       <Route path="/kid/do/:id" element={<ChoreDo />} />
       <Route path="/kid/wallet" element={<KidWallet />} />
+      <Route path="/kid/badges" element={<KidBadges />} />
+      <Route path="/kid/shop" element={<KidShop />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

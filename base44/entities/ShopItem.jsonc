@@ -1,0 +1,40 @@
+{
+  "name": "ShopItem",
+  "type": "object",
+  "properties": {
+    "family_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "emoji": {
+      "type": "string",
+      "default": "\ud83c\udf81"
+    },
+    "price": {
+      "type": "number"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "real",
+        "virtual"
+      ],
+      "default": "real",
+      "description": "real = parent-approved reward, virtual = avatar cosmetic"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "family_id",
+    "title",
+    "price"
+  ]
+}

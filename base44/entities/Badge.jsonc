@@ -1,0 +1,33 @@
+{
+  "name": "Badge",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "Unique identifier like first_quest, streak_7"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "emoji": {
+      "type": "string"
+    },
+    "tier": {
+      "type": "string",
+      "enum": [
+        "bronze",
+        "silver",
+        "gold",
+        "legendary"
+      ],
+      "default": "bronze"
+    }
+  },
+  "required": [
+    "key",
+    "title"
+  ]
+}
