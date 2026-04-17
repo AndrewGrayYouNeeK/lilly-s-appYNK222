@@ -20,6 +20,9 @@ import ChoreDo from '@/pages/ChoreDo';
 import KidWallet from '@/pages/KidWallet';
 import KidBadges from '@/pages/KidBadges';
 import KidShop from '@/pages/KidShop';
+import KidStreak from '@/pages/KidStreak';
+import Leaderboard from '@/pages/Leaderboard';
+import ParentReports from '@/pages/ParentReports';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -52,6 +55,10 @@ const AuthenticatedApp = () => {
       <Route path="/kid/wallet" element={<KidWallet />} />
       <Route path="/kid/badges" element={<KidBadges />} />
       <Route path="/kid/shop" element={<KidShop />} />
+      <Route path="/kid/streak" element={<KidStreak />} />
+      <Route path="/kid/leaderboard" element={<Leaderboard />} />
+      <Route path="/parent/reports" element={<ParentReports />} />
+      <Route path="/parent/leaderboard" element={<Leaderboard />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

@@ -5,7 +5,7 @@ import { base44 } from '@/api/base44Client';
 import Shell from '@/components/Shell';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Copy, CheckSquare, TrendingUp, Users, Plus } from 'lucide-react';
+import { Copy, CheckSquare, TrendingUp, Users, Plus, BarChart3, Medal } from 'lucide-react';
 import { formatMoney } from '@/lib/cq';
 import { toast } from 'sonner';
 
@@ -61,10 +61,20 @@ export default function ParentDashboard() {
       </Card>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 mb-5">
+      <div className="grid grid-cols-3 gap-3 mb-3">
         <Stat icon={CheckSquare} label="Pending" value={pending.length} tone="accent" onClick={() => nav('/parent/approvals')} />
         <Stat icon={Users} label="Kids" value={kids.length} tone="primary" />
-        <Stat icon={TrendingUp} label="This week" value={formatMoney(thisWeek.reduce((s,c)=>s+(c.paid_amount||0),0), family?.currency_symbol)} tone="secondary" />
+        <Stat icon={TrendingUp} label="This week" value={formatMoney(thisWeek.reduce((s,c)=>s+(c.paid_amount||0),0), family?.currency_symbol)} tone="secondary" onClick={() => nav('/parent/reports')} />
+      </div>
+
+      {/* Quick links */}
+      <div className="grid grid-cols-2 gap-2 mb-5">
+        <button onClick={() => nav('/parent/reports')} className="bounce-tap flex items-center gap-2 p-3 rounded-xl bg-card border border-border text-sm font-medium">
+          <BarChart3 className="w-4 h-4 text-primary" /> Reports
+        </button>
+        <button onClick={() => nav('/parent/leaderboard')} className="bounce-tap flex items-center gap-2 p-3 rounded-xl bg-card border border-border text-sm font-medium">
+          <Medal className="w-4 h-4 text-secondary" /> Leaderboard
+        </button>
       </div>
 
       {/* Kids list */}

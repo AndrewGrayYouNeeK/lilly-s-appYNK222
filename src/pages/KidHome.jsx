@@ -5,6 +5,7 @@ import { base44 } from '@/api/base44Client';
 import Shell from '@/components/Shell';
 import { Card } from '@/components/ui/card';
 import AvatarRing from '@/components/AvatarRing';
+import DailyTip from '@/components/DailyTip';
 import { Progress } from '@/components/ui/progress';
 import { Wallet, Flame, Trophy, ChevronRight } from 'lucide-react';
 import { formatMoney, streakMultiplier, todayISO } from '@/lib/cq';
@@ -62,8 +63,10 @@ export default function KidHome() {
         <AvatarRing emoji={me?.avatar_emoji || '🦊'} completedCount={approvedCount} size={88} />
       </header>
 
+      <DailyTip age={me?.age} />
+
       {/* Streak hero */}
-      <Card className="p-6 mb-4 bg-gradient-to-br from-secondary to-accent text-primary-foreground overflow-hidden relative">
+      <Card onClick={() => nav('/kid/streak')} className="p-6 mb-4 bg-gradient-to-br from-secondary to-accent text-primary-foreground overflow-hidden relative cursor-pointer bounce-tap">
         <div className="relative z-10">
           <div className="text-xs uppercase tracking-wider opacity-80">Current streak</div>
           <div className="flex items-baseline gap-3 mt-1">
@@ -78,6 +81,11 @@ export default function KidHome() {
           )}
         </div>
       </Card>
+
+      {/* Leaderboard link */}
+      <button onClick={() => nav('/kid/leaderboard')} className="w-full mb-4 bounce-tap flex items-center justify-center gap-2 py-2 text-sm font-semibold text-primary">
+        <Trophy className="w-4 h-4" /> See family leaderboard
+      </button>
 
       {/* Wallet */}
       <Card onClick={() => nav('/kid/wallet')} className="p-5 mb-4 cursor-pointer bounce-tap flex items-center gap-4">
