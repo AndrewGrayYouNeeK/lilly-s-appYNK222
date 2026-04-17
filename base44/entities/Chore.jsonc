@@ -1,0 +1,50 @@
+{
+  "name": "Chore",
+  "type": "object",
+  "properties": {
+    "family_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "value": {
+      "type": "number",
+      "description": "Payout amount in family currency"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "easy",
+        "medium",
+        "hard"
+      ],
+      "default": "easy"
+    },
+    "recurrence": {
+      "type": "string",
+      "enum": [
+        "one_time",
+        "daily",
+        "weekly"
+      ],
+      "default": "daily"
+    },
+    "emoji": {
+      "type": "string",
+      "default": "\u2728"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "family_id",
+    "title",
+    "value"
+  ]
+}

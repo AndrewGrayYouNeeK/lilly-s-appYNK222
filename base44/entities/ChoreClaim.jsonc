@@ -1,0 +1,59 @@
+{
+  "name": "ChoreClaim",
+  "type": "object",
+  "properties": {
+    "family_id": {
+      "type": "string"
+    },
+    "chore_id": {
+      "type": "string"
+    },
+    "chore_title": {
+      "type": "string"
+    },
+    "chore_emoji": {
+      "type": "string"
+    },
+    "chore_value": {
+      "type": "number"
+    },
+    "kid_email": {
+      "type": "string"
+    },
+    "kid_name": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "claimed",
+        "before_done",
+        "submitted",
+        "approved",
+        "redo"
+      ],
+      "default": "claimed"
+    },
+    "before_photo_url": {
+      "type": "string"
+    },
+    "after_photo_url": {
+      "type": "string"
+    },
+    "review_comment": {
+      "type": "string"
+    },
+    "paid_amount": {
+      "type": "number"
+    },
+    "claim_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "family_id",
+    "chore_id",
+    "kid_email"
+  ]
+}

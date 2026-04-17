@@ -1,0 +1,28 @@
+{
+  "name": "Streak",
+  "type": "object",
+  "properties": {
+    "kid_email": {
+      "type": "string"
+    },
+    "family_id": {
+      "type": "string"
+    },
+    "current_count": {
+      "type": "number",
+      "default": 0
+    },
+    "longest_count": {
+      "type": "number",
+      "default": 0
+    },
+    "last_completed_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "kid_email",
+    "family_id"
+  ]
+}

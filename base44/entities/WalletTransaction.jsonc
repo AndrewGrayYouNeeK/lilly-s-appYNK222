@@ -1,0 +1,36 @@
+{
+  "name": "WalletTransaction",
+  "type": "object",
+  "properties": {
+    "kid_email": {
+      "type": "string"
+    },
+    "family_id": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "earn",
+        "bonus",
+        "spend",
+        "cashout"
+      ],
+      "default": "earn"
+    },
+    "description": {
+      "type": "string"
+    },
+    "claim_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "kid_email",
+    "family_id",
+    "amount"
+  ]
+}
