@@ -10,6 +10,7 @@ import { formatMoney, todayISO, streakMultiplier } from '@/lib/cq';
 import { checkAndAwardBadges, checkFamilyQuests } from '@/lib/gamification';
 import { notify } from '@/lib/notify';
 import ClaimCommentThread from '@/components/ClaimCommentThread';
+import AiVerdictBadge from '@/components/AiVerdictBadge';
 import { toast } from 'sonner';
 
 export default function ParentApprovals() {
@@ -153,6 +154,9 @@ export default function ParentApprovals() {
                 <Photo label="After"  url={c.after_photo_url}  />
               </div>
               <div className="p-4 space-y-3">
+                {c.ai_verdict && (
+                  <AiVerdictBadge verdict={c.ai_verdict} score={c.ai_score} reasoning={c.ai_reasoning} />
+                )}
                 <Textarea
                   placeholder="Comment (optional, for redo)"
                   value={comment[c.id] || ''}

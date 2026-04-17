@@ -49,6 +49,23 @@
     "claim_date": {
       "type": "string",
       "format": "date"
+    },
+    "ai_verdict": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "looks_good",
+        "needs_review",
+        "suspicious"
+      ],
+      "description": "AI verdict on the before/after photo pair"
+    },
+    "ai_score": {
+      "type": "number",
+      "description": "Quality/effort score 0-100"
+    },
+    "ai_reasoning": {
+      "type": "string"
     }
   },
   "required": [

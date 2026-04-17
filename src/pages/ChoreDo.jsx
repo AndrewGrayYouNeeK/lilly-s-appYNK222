@@ -32,7 +32,7 @@ export default function ChoreDo() {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       const update = which === 'before'
         ? { before_photo_url: file_url, status: 'before_done' }
-        : { after_photo_url: file_url, status: 'submitted' };
+        : { after_photo_url: file_url, status: 'submitted', ai_verdict: 'pending' };
       await base44.entities.ChoreClaim.update(id, update);
       await refetch();
       qc.invalidateQueries({ queryKey: ['myClaims'] });
