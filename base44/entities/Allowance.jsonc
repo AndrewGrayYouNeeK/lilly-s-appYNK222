@@ -1,0 +1,36 @@
+{
+  "name": "Allowance",
+  "type": "object",
+  "properties": {
+    "family_id": {
+      "type": "string"
+    },
+    "kid_email": {
+      "type": "string"
+    },
+    "kid_name": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "day_of_week": {
+      "type": "number",
+      "default": 0,
+      "description": "0=Sunday, 6=Saturday"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    },
+    "last_paid_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "family_id",
+    "kid_email",
+    "amount"
+  ]
+}

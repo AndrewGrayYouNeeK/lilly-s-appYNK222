@@ -71,6 +71,20 @@ export default function ParentApprovals() {
         });
       }
 
+      // Auto-allocate to savings goals
+      const goals = await base44.entities.SavingsGoal.filter({ kid_email: claim.kid_email, status: 'active' });
+      for (const g of goals) {
+        if (!g.allocation_pct) continue;
+        const add = Math.round(paid * (g.allocation_pct / 100) * 100) / 100;
+        if (add <= 0) continue;
+        const newSaved = Math.round((g.saved_amount + add) * 100) / 100;
+        const achieved = newSaved >= g.target_amount;
+        await base44.entities.SavingsGoal.update(g.id, {
+          saved_amount: newSaved,
+          status: achieved ? 'achieved' : 'active',
+        });
+      }
+
       // Award badges + check family quests
       const newBadges = await checkAndAwardBadges({ kidEmail: claim.kid_email, familyId: claim.family_id });
       await checkFamilyQuests(claim.family_id);

@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/card';
 import AvatarRing from '@/components/AvatarRing';
 import DailyTip from '@/components/DailyTip';
 import { Progress } from '@/components/ui/progress';
-import { Wallet, Flame, Trophy, ChevronRight } from 'lucide-react';
+import { Wallet, Flame, Trophy, ChevronRight, Target } from 'lucide-react';
 import { formatMoney, streakMultiplier, todayISO } from '@/lib/cq';
 
 export default function KidHome() {
@@ -82,10 +82,15 @@ export default function KidHome() {
         </div>
       </Card>
 
-      {/* Leaderboard link */}
-      <button onClick={() => nav('/kid/leaderboard')} className="w-full mb-4 bounce-tap flex items-center justify-center gap-2 py-2 text-sm font-semibold text-primary">
-        <Trophy className="w-4 h-4" /> See family leaderboard
-      </button>
+      {/* Quick links */}
+      <div className="grid grid-cols-2 gap-2 mb-4">
+        <button onClick={() => nav('/kid/goals')} className="bounce-tap flex items-center justify-center gap-2 py-2.5 rounded-xl bg-card border border-border text-sm font-semibold">
+          <Target className="w-4 h-4 text-secondary" /> Goals
+        </button>
+        <button onClick={() => nav('/kid/leaderboard')} className="bounce-tap flex items-center justify-center gap-2 py-2.5 rounded-xl bg-card border border-border text-sm font-semibold">
+          <Trophy className="w-4 h-4 text-primary" /> Leaderboard
+        </button>
+      </div>
 
       {/* Wallet */}
       <Card onClick={() => nav('/kid/wallet')} className="p-5 mb-4 cursor-pointer bounce-tap flex items-center gap-4">
