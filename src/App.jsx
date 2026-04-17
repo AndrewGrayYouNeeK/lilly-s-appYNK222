@@ -23,6 +23,7 @@ import KidShop from '@/pages/KidShop';
 import KidStreak from '@/pages/KidStreak';
 import Leaderboard from '@/pages/Leaderboard';
 import ParentReports from '@/pages/ParentReports';
+import FamilyChat from '@/pages/FamilyChat';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -59,6 +60,8 @@ const AuthenticatedApp = () => {
       <Route path="/kid/leaderboard" element={<Leaderboard />} />
       <Route path="/parent/reports" element={<ParentReports />} />
       <Route path="/parent/leaderboard" element={<Leaderboard />} />
+      <Route path="/parent/chat" element={<FamilyChat />} />
+      <Route path="/kid/chat" element={<FamilyChat />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

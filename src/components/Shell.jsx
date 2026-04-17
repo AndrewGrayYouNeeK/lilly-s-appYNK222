@@ -1,18 +1,21 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, ListChecks, CheckSquare, Home, Wallet, Flame, Trophy, ShoppingBag, Gift, Medal } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
+import { LayoutDashboard, ListChecks, CheckSquare, Home, Wallet, Flame, Trophy, ShoppingBag, Gift, Medal, MessageCircle } from 'lucide-react';
+import NotificationBell from '@/components/NotificationBell';
 
 const parentTabs = [
   { to: '/parent', icon: LayoutDashboard, label: 'Home' },
   { to: '/parent/chores', icon: ListChecks, label: 'Chores' },
   { to: '/parent/approvals', icon: CheckSquare, label: 'Approve' },
-  { to: '/parent/quests', icon: Trophy, label: 'Quests' },
+  { to: '/parent/chat', icon: MessageCircle, label: 'Chat' },
   { to: '/parent/shop', icon: Gift, label: 'Shop' },
 ];
 const kidTabs = [
   { to: '/kid', icon: Home, label: 'Home' },
   { to: '/kid/pool', icon: Flame, label: 'Quests' },
-  { to: '/kid/badges', icon: Medal, label: 'Badges' },
+  { to: '/kid/chat', icon: MessageCircle, label: 'Chat' },
   { to: '/kid/shop', icon: ShoppingBag, label: 'Shop' },
   { to: '/kid/wallet', icon: Wallet, label: 'Wallet' },
 ];
@@ -21,8 +24,15 @@ export default function Shell({ role, children }) {
   const { pathname } = useLocation();
   const tabs = role === 'parent' ? parentTabs : kidTabs;
 
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+
   return (
     <div className="min-h-screen bg-background pb-24">
+      <div className="fixed top-3 right-3 z-40">
+        <div className="glass rounded-full border border-border shadow">
+          <NotificationBell email={me?.email} />
+        </div>
+      </div>
       <main className="max-w-xl mx-auto px-5 pt-6">{children}</main>
       <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
         <div className="glass border border-border shadow-xl rounded-full px-2 py-2 flex gap-1">

@@ -1,0 +1,50 @@
+{
+  "name": "Message",
+  "type": "object",
+  "properties": {
+    "family_id": {
+      "type": "string"
+    },
+    "author_email": {
+      "type": "string"
+    },
+    "author_name": {
+      "type": "string"
+    },
+    "author_emoji": {
+      "type": "string"
+    },
+    "author_role": {
+      "type": "string",
+      "enum": [
+        "parent",
+        "kid"
+      ]
+    },
+    "text": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "string",
+      "enum": [
+        "family",
+        "claim"
+      ],
+      "default": "family",
+      "description": "family = chat, claim = thread on a specific chore claim"
+    },
+    "claim_id": {
+      "type": "string"
+    },
+    "reactions": {
+      "type": "object",
+      "description": "Map of emoji -> array of user emails who reacted",
+      "default": {}
+    }
+  },
+  "required": [
+    "family_id",
+    "author_email",
+    "text"
+  ]
+}

@@ -6,6 +6,8 @@ import Shell from '@/components/Shell';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Camera, Upload, X, RefreshCw } from 'lucide-react';
+import { notifyParents } from '@/lib/notify';
+import ClaimCommentThread from '@/components/ClaimCommentThread';
 import { toast } from 'sonner';
 
 export default function ChoreDo() {
@@ -20,6 +22,7 @@ export default function ChoreDo() {
     queryKey: ['claim', id],
     queryFn: () => base44.entities.ChoreClaim.filter({ id }).then(r => r[0]),
   });
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
 
   if (!claim) return <Shell role="kid"><div className="text-center py-10 text-muted-foreground">Loading…</div></Shell>;
 
@@ -35,6 +38,12 @@ export default function ChoreDo() {
       qc.invalidateQueries({ queryKey: ['myClaims'] });
       qc.invalidateQueries({ queryKey: ['pending'] });
       if (which === 'after') {
+        await notifyParents({
+          family_id: claim.family_id, type: 'submission', emoji: '📮',
+          title: `${claim.kid_name} submitted: ${claim.chore_title}`,
+          body: 'Tap to review and approve',
+          link: '/parent/approvals',
+        });
         toast.success('Submitted for approval! 🎉');
         setTimeout(() => nav('/kid'), 900);
       } else {
@@ -123,6 +132,12 @@ export default function ChoreDo() {
         <button onClick={cancel} className="w-full mt-2 text-xs text-muted-foreground flex items-center justify-center gap-1 py-2">
           <X className="w-3 h-3" /> Cancel quest
         </button>
+      )}
+
+      {me && (
+        <Card className="p-4 mt-4">
+          <ClaimCommentThread claim={claim} me={me} />
+        </Card>
       )}
     </Shell>
   );

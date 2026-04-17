@@ -5,6 +5,7 @@ import Shell from '@/components/Shell';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { formatMoney } from '@/lib/cq';
+import { notifyParents } from '@/lib/notify';
 import { toast } from 'sonner';
 import { ShoppingBag, Clock } from 'lucide-react';
 
@@ -46,6 +47,12 @@ export default function KidShop() {
       await base44.entities.WalletTransaction.create({
         kid_email: me.email, family_id: me.family_id,
         amount: item.price, type: 'spend', description: `Bought: ${item.title}`,
+      });
+      await notifyParents({
+        family_id: me.family_id, type: 'purchase', emoji: '🛍️',
+        title: `${me.display_name || me.full_name} bought ${item.title}`,
+        body: `${item.emoji} ${formatMoney(item.price, family?.currency_symbol || '$')} — please fulfill`,
+        link: '/parent/shop',
       });
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['txs'] }); qc.invalidateQueries({ queryKey: ['purchases'] }); toast.success('Purchased! Waiting for parent.'); },

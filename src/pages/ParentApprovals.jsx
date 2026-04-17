@@ -8,6 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Check, RefreshCcw, Inbox } from 'lucide-react';
 import { formatMoney, todayISO, streakMultiplier } from '@/lib/cq';
 import { checkAndAwardBadges, checkFamilyQuests } from '@/lib/gamification';
+import { notify } from '@/lib/notify';
+import ClaimCommentThread from '@/components/ClaimCommentThread';
 import { toast } from 'sonner';
 
 export default function ParentApprovals() {
@@ -72,6 +74,15 @@ export default function ParentApprovals() {
       // Award badges + check family quests
       const newBadges = await checkAndAwardBadges({ kidEmail: claim.kid_email, familyId: claim.family_id });
       await checkFamilyQuests(claim.family_id);
+
+      // Notify the kid
+      await notify({
+        recipient_email: claim.kid_email, family_id: claim.family_id,
+        type: 'approval', emoji: '✅',
+        title: `Approved: ${claim.chore_title}`,
+        body: `You earned ${formatMoney(paid, family?.currency_symbol)}${bonus > 0 ? ` (incl. ${Math.round((mult-1)*100)}% streak bonus)` : ''}`,
+        link: '/kid/wallet',
+      });
       return { newBadges };
     },
     onSuccess: (res) => {
@@ -83,7 +94,16 @@ export default function ParentApprovals() {
   });
 
   const redo = useMutation({
-    mutationFn: ({ claim, note }) => base44.entities.ChoreClaim.update(claim.id, { status: 'redo', review_comment: note }),
+    mutationFn: async ({ claim, note }) => {
+      await base44.entities.ChoreClaim.update(claim.id, { status: 'redo', review_comment: note });
+      await notify({
+        recipient_email: claim.kid_email, family_id: claim.family_id,
+        type: 'redo', emoji: '🔁',
+        title: `Redo needed: ${claim.chore_title}`,
+        body: note || 'Please take another look',
+        link: `/kid/do/${claim.id}`,
+      });
+    },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['pending'] }); toast('Sent back for redo'); },
   });
 
@@ -134,6 +154,7 @@ export default function ParentApprovals() {
                     <Check className="w-4 h-4 mr-1.5" /> Approve
                   </Button>
                 </div>
+                <ClaimCommentThread claim={c} me={me} />
               </div>
             </Card>
           ))}
