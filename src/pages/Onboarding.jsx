@@ -72,7 +72,7 @@ export default function Onboarding() {
         <div className="max-w-md w-full">
           <div className="text-center mb-10">
             <div className="inline-flex items-center gap-2 text-5xl mb-4"><Sparkles className="w-8 h-8 text-secondary" /><span className="flame">🔥</span></div>
-            <h1 className="font-display text-5xl font-bold text-primary mb-2">ChoreQuest</h1>
+            <h1 className="font-display text-5xl font-bold text-primary mb-2">Lilly's app</h1>
             <p className="text-muted-foreground">Chores they'll actually want to do.</p>
           </div>
           <div className="space-y-3">
