@@ -11,6 +11,9 @@ import { checkAndAwardBadges, checkFamilyQuests } from '@/lib/gamification';
 import { notify } from '@/lib/notify';
 import ClaimCommentThread from '@/components/ClaimCommentThread';
 import AiVerdictBadge from '@/components/AiVerdictBadge';
+import { computeFamilyBalance, loadFamilyWalletTxs } from '@/lib/familyWallet';
+import { AlertTriangle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 
 export default function ParentApprovals() {
@@ -26,6 +29,12 @@ export default function ParentApprovals() {
     queryFn: () => base44.entities.ChoreClaim.filter({ family_id: me.family_id, status: 'submitted' }, '-created_date'),
     enabled: !!me?.family_id,
   });
+  const { data: familyTxs = [] } = useQuery({
+    queryKey: ['familyWallet', me?.family_id],
+    queryFn: () => loadFamilyWalletTxs(me.family_id),
+    enabled: !!me?.family_id,
+  });
+  const poolBalance = computeFamilyBalance(familyTxs);
 
   const [comment, setComment] = useState({});
 
@@ -59,6 +68,24 @@ export default function ParentApprovals() {
       const base = claim.chore_value || 0;
       const paid = Math.round(base * mult * 100) / 100;
       const bonus = Math.round((paid - base) * 100) / 100;
+
+      // Check family pool funds
+      const currentTxs = await loadFamilyWalletTxs(claim.family_id);
+      const currentBalance = computeFamilyBalance(currentTxs);
+      if (currentBalance < paid) {
+        throw new Error(`Not enough in family pool (${formatMoney(currentBalance, family?.currency_symbol)}). Add funds first.`);
+      }
+
+      // Deduct from family pool
+      await base44.entities.FamilyWalletTransaction.create({
+        family_id: claim.family_id,
+        amount: -paid,
+        type: 'payout',
+        description: `Paid ${claim.kid_name} for: ${claim.chore_title}`,
+        actor_email: me.email,
+        kid_email: claim.kid_email,
+        claim_id: claim.id,
+      });
 
       await base44.entities.ChoreClaim.update(claim.id, { status: 'approved', paid_amount: paid });
       await base44.entities.WalletTransaction.create({
@@ -103,9 +130,11 @@ export default function ParentApprovals() {
     onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ['pending'] });
       qc.invalidateQueries({ queryKey: ['claims'] });
+      qc.invalidateQueries({ queryKey: ['familyWallet'] });
       const extra = res?.newBadges?.length ? ` · ${res.newBadges.length} new badge${res.newBadges.length>1?'s':''}!` : '';
       toast.success(`Approved & paid!${extra}`);
     },
+    onError: (e) => toast.error(e.message),
   });
 
   const redo = useMutation({
@@ -128,6 +157,17 @@ export default function ParentApprovals() {
         <h1 className="font-display text-3xl font-bold text-primary">Approvals</h1>
         <p className="text-sm text-muted-foreground">{pending.length} waiting for you</p>
       </header>
+
+      <Link to="/parent/funds">
+        <Card className={`p-3 mb-4 flex items-center gap-3 cursor-pointer bounce-tap ${poolBalance <= 0 ? 'bg-destructive/10 border-destructive/40' : ''}`}>
+          {poolBalance <= 0 && <AlertTriangle className="w-5 h-5 text-destructive shrink-0" />}
+          <div className="flex-1">
+            <div className="text-xs text-muted-foreground uppercase tracking-wide">Family pool</div>
+            <div className="font-display text-xl font-bold">{formatMoney(poolBalance, family?.currency_symbol)}</div>
+          </div>
+          <div className="text-xs font-semibold text-primary">{poolBalance <= 0 ? 'Add funds →' : 'Manage →'}</div>
+        </Card>
+      </Link>
 
       {pending.length === 0 ? (
         <Card className="p-10 text-center">

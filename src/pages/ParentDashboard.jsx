@@ -5,8 +5,9 @@ import { base44 } from '@/api/base44Client';
 import Shell from '@/components/Shell';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Copy, CheckSquare, TrendingUp, Users, Plus, BarChart3, Medal, Baby, Sparkles } from 'lucide-react';
+import { Copy, CheckSquare, TrendingUp, Users, Plus, BarChart3, Medal, Baby, Sparkles, Wallet } from 'lucide-react';
 import { formatMoney } from '@/lib/cq';
+import { computeFamilyBalance, loadFamilyWalletTxs } from '@/lib/familyWallet';
 import { toast } from 'sonner';
 
 export default function ParentDashboard() {
@@ -28,6 +29,12 @@ export default function ParentDashboard() {
     queryFn: () => base44.entities.ChoreClaim.filter({ family_id: me.family_id }, '-created_date', 50),
     enabled: !!me?.family_id,
   });
+  const { data: familyTxs = [] } = useQuery({
+    queryKey: ['familyWallet', me?.family_id],
+    queryFn: () => loadFamilyWalletTxs(me.family_id),
+    enabled: !!me?.family_id,
+  });
+  const poolBalance = computeFamilyBalance(familyTxs);
 
   const pending = claims.filter(c => c.status === 'submitted');
   const approved = claims.filter(c => c.status === 'approved');
@@ -66,6 +73,18 @@ export default function ParentDashboard() {
         <Stat icon={Users} label="Kids" value={kids.length} tone="primary" />
         <Stat icon={TrendingUp} label="This week" value={formatMoney(thisWeek.reduce((s,c)=>s+(c.paid_amount||0),0), family?.currency_symbol)} tone="secondary" onClick={() => nav('/parent/reports')} />
       </div>
+
+      {/* Family Pool */}
+      <Card onClick={() => nav('/parent/funds')} className={`p-4 mb-3 cursor-pointer bounce-tap flex items-center gap-3 ${poolBalance <= 0 ? 'border-destructive/40 bg-destructive/5' : ''}`}>
+        <div className="w-10 h-10 rounded-full bg-success/15 flex items-center justify-center shrink-0">
+          <Wallet className="w-5 h-5 text-success" />
+        </div>
+        <div className="flex-1">
+          <div className="text-xs text-muted-foreground uppercase tracking-wide">Family Pool</div>
+          <div className="font-display text-xl font-bold leading-tight">{formatMoney(poolBalance, family?.currency_symbol)}</div>
+        </div>
+        <div className="text-xs font-semibold text-primary">{poolBalance <= 0 ? 'Add funds →' : 'Manage →'}</div>
+      </Card>
 
       {/* Coach CTA */}
       <Card onClick={() => nav('/parent/coach')} className="p-4 mb-3 cursor-pointer bounce-tap bg-gradient-to-br from-secondary/20 to-accent/30 border-secondary/30 flex items-center gap-3">

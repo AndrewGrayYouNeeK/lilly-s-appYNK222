@@ -27,6 +27,7 @@ import FamilyChat from '@/pages/FamilyChat';
 import KidGoals from '@/pages/KidGoals';
 import ParentKids from '@/pages/ParentKids';
 import ParentCoach from '@/pages/ParentCoach';
+import ParentFunds from '@/pages/ParentFunds';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -68,6 +69,7 @@ const AuthenticatedApp = () => {
       <Route path="/kid/goals" element={<KidGoals />} />
       <Route path="/parent/kids" element={<ParentKids />} />
       <Route path="/parent/coach" element={<ParentCoach />} />
+      <Route path="/parent/funds" element={<ParentFunds />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

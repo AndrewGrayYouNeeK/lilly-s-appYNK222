@@ -1,0 +1,42 @@
+{
+  "name": "FamilyWalletTransaction",
+  "type": "object",
+  "properties": {
+    "family_id": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Positive = deposit, negative = payout"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "deposit",
+        "payout",
+        "refund",
+        "adjustment"
+      ],
+      "default": "deposit"
+    },
+    "description": {
+      "type": "string"
+    },
+    "actor_email": {
+      "type": "string",
+      "description": "Parent who made the deposit/adjustment"
+    },
+    "kid_email": {
+      "type": "string",
+      "description": "For payouts: the kid who received funds"
+    },
+    "claim_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "family_id",
+    "amount",
+    "type"
+  ]
+}
