@@ -5,7 +5,7 @@ import { base44 } from '@/api/base44Client';
 import Shell from '@/components/Shell';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Copy, CheckSquare, TrendingUp, Users, Plus, BarChart3, Medal, Baby, Sparkles, Wallet } from 'lucide-react';
+import { Copy, CheckSquare, TrendingUp, Users, Plus, BarChart3, Medal, Baby, Sparkles, Wallet, Send } from 'lucide-react';
 import { formatMoney } from '@/lib/cq';
 import { computeFamilyBalance, loadFamilyWalletTxs } from '@/lib/familyWallet';
 import { toast } from 'sonner';
@@ -34,7 +34,13 @@ export default function ParentDashboard() {
     queryFn: () => loadFamilyWalletTxs(me.family_id),
     enabled: !!me?.family_id,
   });
+  const { data: cashoutReqs = [] } = useQuery({
+    queryKey: ['parentCashouts', me?.family_id],
+    queryFn: () => base44.entities.CashoutRequest.filter({ family_id: me.family_id, status: 'pending' }),
+    enabled: !!me?.family_id,
+  });
   const poolBalance = computeFamilyBalance(familyTxs);
+  const pendingCashouts = cashoutReqs.length;
 
   const pending = claims.filter(c => c.status === 'submitted');
   const approved = claims.filter(c => c.status === 'approved');
@@ -84,6 +90,25 @@ export default function ParentDashboard() {
           <div className="font-display text-xl font-bold leading-tight">{formatMoney(poolBalance, family?.currency_symbol)}</div>
         </div>
         <div className="text-xs font-semibold text-primary">{poolBalance <= 0 ? 'Add funds →' : 'Manage →'}</div>
+      </Card>
+
+      {/* Cashout Requests */}
+      <Card onClick={() => nav('/parent/cashouts')} className={`p-4 mb-3 cursor-pointer bounce-tap flex items-center gap-3 ${pendingCashouts > 0 ? 'border-secondary/40 bg-secondary/5' : ''}`}>
+        <div className="w-10 h-10 rounded-full bg-secondary/15 flex items-center justify-center shrink-0 relative">
+          <Send className="w-5 h-5 text-secondary" />
+          {pendingCashouts > 0 && (
+            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-white bg-secondary rounded-full flex items-center justify-center">
+              {pendingCashouts}
+            </span>
+          )}
+        </div>
+        <div className="flex-1">
+          <div className="text-xs text-muted-foreground uppercase tracking-wide">Cashout requests</div>
+          <div className="font-display text-base font-bold leading-tight">
+            {pendingCashouts > 0 ? `${pendingCashouts} waiting for you` : 'No pending requests'}
+          </div>
+        </div>
+        <div className="text-xs font-semibold text-primary">Open →</div>
       </Card>
 
       {/* Coach CTA */}

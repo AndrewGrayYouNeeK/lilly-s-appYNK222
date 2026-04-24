@@ -1,13 +1,16 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import Shell from '@/components/Shell';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { formatMoney } from '@/lib/cq';
 import { format } from 'date-fns';
-import { ArrowDownRight, ArrowUpRight, Sparkles } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, Sparkles, Send, Clock } from 'lucide-react';
 
 export default function KidWallet() {
+  const nav = useNavigate();
   const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
   const { data: family } = useQuery({
     queryKey: ['family', me?.family_id],
@@ -19,12 +22,19 @@ export default function KidWallet() {
     queryFn: () => base44.entities.WalletTransaction.filter({ kid_email: me.email }, '-created_date'),
     enabled: !!me?.email,
   });
+  const { data: cashouts = [] } = useQuery({
+    queryKey: ['cashouts', me?.email],
+    queryFn: () => base44.entities.CashoutRequest.filter({ kid_email: me.email }),
+    enabled: !!me?.email,
+  });
 
   const sym = family?.currency_symbol || '$';
   const earned = txs.filter(t => t.type === 'earn').reduce((s, t) => s + t.amount, 0);
   const bonus = txs.filter(t => t.type === 'bonus').reduce((s, t) => s + t.amount, 0);
   const spent = txs.filter(t => ['spend','cashout'].includes(t.type)).reduce((s, t) => s + t.amount, 0);
   const balance = earned + bonus - spent;
+  const pendingCashout = cashouts.filter(r => r.status === 'pending').reduce((s, r) => s + r.amount, 0);
+  const available = Math.round((balance - pendingCashout) * 100) / 100;
 
   return (
     <Shell role="kid">
@@ -32,14 +42,30 @@ export default function KidWallet() {
         <h1 className="font-display text-3xl font-bold">Wallet</h1>
       </header>
 
-      <Card className="p-6 mb-4 bg-primary text-primary-foreground">
+      <Card className="p-6 mb-3 bg-primary text-primary-foreground">
         <div className="text-xs uppercase tracking-wider opacity-70">Balance</div>
         <div className="font-display text-5xl font-bold mt-1">{formatMoney(balance, sym)}</div>
-        <div className="flex gap-4 mt-4 text-sm opacity-80">
+        <div className="flex gap-4 mt-4 text-sm opacity-80 flex-wrap">
           <div>Earned {formatMoney(earned, sym)}</div>
           {bonus > 0 && <div>+ Bonus {formatMoney(bonus, sym)} 🔥</div>}
         </div>
       </Card>
+
+      <Button
+        onClick={() => nav('/kid/cashout')}
+        disabled={available <= 0}
+        className="w-full h-12 rounded-xl text-base mb-4 bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+      >
+        <Send className="w-4 h-4 mr-1.5" />
+        Cash out {available > 0 ? formatMoney(available, sym) : ''}
+      </Button>
+
+      {pendingCashout > 0 && (
+        <Card className="p-3 mb-4 bg-accent/30 flex items-center gap-2 text-sm">
+          <Clock className="w-4 h-4" />
+          <span>{formatMoney(pendingCashout, sym)} waiting for parent approval</span>
+        </Card>
+      )}
 
       <h2 className="font-display text-lg font-semibold mb-2">History</h2>
       {txs.length === 0 ? (
