@@ -16,7 +16,7 @@ export default function ParentDashboard() {
   const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
   const { data: family } = useQuery({
     queryKey: ['family', me?.family_id],
-    queryFn: () => base44.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
+    queryFn: () => base44.entities.Family.filter({ id: me.family_id }).then(r => r[0] || null),
     enabled: !!me?.family_id,
   });
   const { data: kids = [] } = useQuery({
