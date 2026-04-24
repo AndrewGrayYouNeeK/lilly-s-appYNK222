@@ -48,6 +48,7 @@ export default function ChorePool() {
         kid_name: me.display_name || me.full_name,
         status: 'claimed',
         claim_date: today,
+        requires_photo: chore.requires_photo !== false,
       });
       return c;
     },
@@ -74,14 +75,16 @@ export default function ChorePool() {
         <div className="grid grid-cols-2 gap-3">
           {available.map(c => {
             const d = difficultyStyle(c.difficulty);
+            const needsPhoto = c.requires_photo !== false;
             return (
               <Card key={c.id} className={`p-4 flex flex-col ring-1 ${d.ring}`}>
                 <div className="text-4xl mb-2">{c.emoji}</div>
                 <div className="font-display font-bold leading-tight mb-1">{c.title}</div>
                 {c.description && <div className="text-xs text-muted-foreground line-clamp-2 mb-2 flex-1">{c.description}</div>}
-                <div className="flex items-center justify-between mt-2">
+                <div className="flex items-center justify-between mt-2 gap-1">
                   <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${d.bg} ${d.text}`}>{d.label}</span>
-                  <span className="font-display text-lg font-bold">{formatMoney(c.value, family?.currency_symbol)}</span>
+                  {needsPhoto && <span className="text-[10px]" title="Photo required">📸</span>}
+                  <span className="font-display text-lg font-bold ml-auto">{formatMoney(c.value, family?.currency_symbol)}</span>
                 </div>
                 <Button
                   size="sm"

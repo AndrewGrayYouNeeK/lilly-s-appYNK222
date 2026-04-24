@@ -40,6 +40,11 @@
     "active": {
       "type": "boolean",
       "default": true
+    },
+    "requires_photo": {
+      "type": "boolean",
+      "default": true,
+      "description": "If true, kid must upload before/after photos and AI assesses quality"
     }
   },
   "required": [

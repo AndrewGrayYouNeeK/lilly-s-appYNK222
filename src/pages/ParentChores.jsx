@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Trash2, Sparkles } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Plus, Trash2, Sparkles, Camera } from 'lucide-react';
 import { difficultyStyle, formatMoney } from '@/lib/cq';
 import { toast } from 'sonner';
 
@@ -29,11 +30,11 @@ export default function ParentChores() {
 
   const [showForm, setShowForm] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
-  const [form, setForm] = useState({ title:'', description:'', value:'', difficulty:'easy', emoji:'🧹' });
+  const [form, setForm] = useState({ title:'', description:'', value:'', difficulty:'easy', emoji:'🧹', requires_photo: true });
 
   const createChore = useMutation({
     mutationFn: (data) => base44.entities.Chore.create({ ...data, family_id: me.family_id, active: true }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['chores'] }); setShowForm(false); setForm({ title:'', description:'', value:'', difficulty:'easy', emoji:'🧹' }); toast.success('Chore added!'); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['chores'] }); setShowForm(false); setForm({ title:'', description:'', value:'', difficulty:'easy', emoji:'🧹', requires_photo: true }); toast.success('Chore added!'); },
   });
 
   const removeChore = useMutation({
@@ -132,6 +133,16 @@ export default function ParentChores() {
                 ))}
               </div>
             </div>
+            <div className="flex items-center justify-between rounded-xl border border-border bg-muted/40 p-3">
+              <div className="flex items-start gap-2.5">
+                <Camera className="w-4 h-4 text-primary mt-0.5" />
+                <div>
+                  <div className="text-sm font-semibold leading-tight">Require photo proof</div>
+                  <div className="text-[11px] text-muted-foreground leading-snug">Kid uploads before/after photos. AI gives you a quality assessment.</div>
+                </div>
+              </div>
+              <Switch checked={form.requires_photo} onCheckedChange={v => setForm({...form, requires_photo: v})} />
+            </div>
             <div className="flex gap-2 pt-1">
               <Button variant="outline" className="flex-1" onClick={() => setShowForm(false)}>Cancel</Button>
               <Button className="flex-1" onClick={submit}>Save chore</Button>
@@ -147,9 +158,14 @@ export default function ParentChores() {
             <Card key={c.id} className="p-4 flex items-center gap-3">
               <div className="text-3xl">{c.emoji}</div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <div className="font-semibold truncate">{c.title}</div>
                   <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${d.bg} ${d.text}`}>{d.label}</span>
+                  {c.requires_photo !== false && (
+                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-primary/10 text-primary inline-flex items-center gap-0.5">
+                      <Camera className="w-2.5 h-2.5" /> Photo
+                    </span>
+                  )}
                 </div>
                 {c.description && <div className="text-xs text-muted-foreground truncate">{c.description}</div>}
               </div>

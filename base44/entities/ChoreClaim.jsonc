@@ -66,6 +66,11 @@
     },
     "ai_reasoning": {
       "type": "string"
+    },
+    "requires_photo": {
+      "type": "boolean",
+      "default": true,
+      "description": "Snapshot of the chore's photo requirement at claim time"
     }
   },
   "required": [

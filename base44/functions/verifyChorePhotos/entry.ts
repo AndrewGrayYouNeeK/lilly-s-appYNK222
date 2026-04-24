@@ -9,6 +9,9 @@ Deno.serve(async (req) => {
 
     const claim = await base44.asServiceRole.entities.ChoreClaim.filter({ id: claimId }).then(r => r[0]);
     if (!claim) return Response.json({ error: 'Claim not found' }, { status: 404 });
+    if (claim.requires_photo === false) {
+      return Response.json({ skipped: 'photo not required for this chore' });
+    }
     if (!claim.before_photo_url || !claim.after_photo_url) {
       return Response.json({ skipped: 'missing photos' });
     }
