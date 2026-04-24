@@ -51,5 +51,28 @@
     "family_id",
     "title",
     "value"
-  ]
+  ],
+  "rls": {
+    "read": {
+      "data.family_id": "{{user.family_id}}"
+    },
+    "create": {
+      "data.family_id": "{{user.family_id}}",
+      "user_condition": {
+        "app_role": "parent"
+      }
+    },
+    "update": {
+      "data.family_id": "{{user.family_id}}",
+      "user_condition": {
+        "app_role": "parent"
+      }
+    },
+    "delete": {
+      "data.family_id": "{{user.family_id}}",
+      "user_condition": {
+        "app_role": "parent"
+      }
+    }
+  }
 }

@@ -43,5 +43,19 @@
   "required": [
     "recipient_email",
     "title"
-  ]
+  ],
+  "rls": {
+    "read": {
+      "data.recipient_email": "{{user.email}}"
+    },
+    "create": {
+      "data.family_id": "{{user.family_id}}"
+    },
+    "update": {
+      "data.recipient_email": "{{user.email}}"
+    },
+    "delete": {
+      "data.recipient_email": "{{user.email}}"
+    }
+  }
 }

@@ -42,5 +42,20 @@
     "kid_email",
     "title",
     "target_amount"
-  ]
+  ],
+  "rls": {
+    "read": {
+      "data.family_id": "{{user.family_id}}"
+    },
+    "create": {
+      "data.family_id": "{{user.family_id}}",
+      "data.kid_email": "{{user.email}}"
+    },
+    "update": {
+      "data.family_id": "{{user.family_id}}"
+    },
+    "delete": {
+      "data.family_id": "{{user.family_id}}"
+    }
+  }
 }

@@ -25,5 +25,22 @@
   "required": [
     "name",
     "invite_code"
-  ]
+  ],
+  "rls": {
+    "read": {
+      "id": "{{user.family_id}}"
+    },
+    "update": {
+      "id": "{{user.family_id}}",
+      "user_condition": {
+        "app_role": "parent"
+      }
+    },
+    "delete": {
+      "id": "{{user.family_id}}",
+      "user_condition": {
+        "app_role": "parent"
+      }
+    }
+  }
 }

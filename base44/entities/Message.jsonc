@@ -46,5 +46,20 @@
     "family_id",
     "author_email",
     "text"
-  ]
+  ],
+  "rls": {
+    "read": {
+      "data.family_id": "{{user.family_id}}"
+    },
+    "create": {
+      "data.family_id": "{{user.family_id}}",
+      "data.author_email": "{{user.email}}"
+    },
+    "update": {
+      "data.author_email": "{{user.email}}"
+    },
+    "delete": {
+      "data.author_email": "{{user.email}}"
+    }
+  }
 }
