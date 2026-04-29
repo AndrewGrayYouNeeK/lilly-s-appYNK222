@@ -45,7 +45,29 @@ export default function FamilyChat() {
         })));
       }
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['chat'] }),
+    onMutate: async (text) => {
+      await qc.cancelQueries({ queryKey: ['chat', me?.family_id] });
+      const prev = qc.getQueryData(['chat', me?.family_id]);
+      const optimistic = {
+        id: `temp-msg-${Date.now()}`,
+        family_id: me.family_id,
+        author_email: me.email,
+        author_name: me.display_name || me.full_name,
+        author_emoji: me.avatar_emoji || '🙂',
+        author_role: me.app_role,
+        text,
+        scope: 'family',
+        reactions: {},
+        created_date: new Date().toISOString(),
+        _optimistic: true,
+      };
+      qc.setQueryData(['chat', me?.family_id], (old = []) => [...old, optimistic]);
+      return { prev };
+    },
+    onError: (_e, _v, ctx) => {
+      if (ctx?.prev !== undefined) qc.setQueryData(['chat', me?.family_id], ctx.prev);
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['chat'] }),
   });
 
   const role = me?.app_role === 'kid' ? 'kid' : 'parent';

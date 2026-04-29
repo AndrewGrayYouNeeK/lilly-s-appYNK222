@@ -6,8 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { genInviteCode, fetchMe } from '@/lib/cq';
 import { Sparkles, Users, Baby } from 'lucide-react';
+import EmojiPickerDrawer from '@/components/EmojiPickerDrawer';
 
-const AVATARS = ['🦊', '🐼', '🐯', '🐵', '🦁', '🐸', '🐙', '🦄'];
+const AVATARS = ['🦊', '🐼', '🐯', '🐵', '🦁', '🐸', '🐙', '🦄', '🐨', '🐰', '🐶', '🐱', '🐻', '🐮', '🐷', '🐔'];
 
 export default function Onboarding() {
   const nav = useNavigate();
@@ -110,13 +111,13 @@ export default function Onboarding() {
         <div className="space-y-4">
           <div>
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Your name</label>
-            <Input value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="e.g. Mia" className="mt-1.5" />
+            <Input value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="e.g. Mia" className="mt-1.5 h-11" />
           </div>
 
           {mode === 'parent' && (
             <div>
               <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Family name</label>
-              <Input value={familyName} onChange={e => setFamilyName(e.target.value)} placeholder="The Johnsons" className="mt-1.5" />
+              <Input value={familyName} onChange={e => setFamilyName(e.target.value)} placeholder="The Johnsons" className="mt-1.5 h-11" />
             </div>
           )}
 
@@ -124,24 +125,24 @@ export default function Onboarding() {
             <>
               <div>
                 <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Family code</label>
-                <Input value={inviteCode} onChange={e => setInviteCode(e.target.value.toUpperCase())} placeholder="ABC123" className="mt-1.5 tracking-widest font-mono" maxLength={6} />
+                <Input value={inviteCode} onChange={e => setInviteCode(e.target.value.toUpperCase())} placeholder="ABC123" className="mt-1.5 tracking-widest font-mono h-11" maxLength={6} />
               </div>
               <div>
                 <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Age</label>
-                <Input type="number" value={age} onChange={e => setAge(e.target.value)} placeholder="9" className="mt-1.5" />
+                <Input type="number" value={age} onChange={e => setAge(e.target.value)} placeholder="9" className="mt-1.5 h-11" />
               </div>
             </>
           )}
 
           <div>
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Pick an avatar</label>
-            <div className="mt-2 grid grid-cols-8 gap-2">
-              {AVATARS.map(a => (
-                <button key={a} onClick={() => setAvatar(a)}
-                  className={`text-2xl aspect-square rounded-xl transition bounce-tap ${avatar === a ? 'bg-secondary/20 ring-2 ring-secondary' : 'bg-muted'}`}>
-                  {a}
-                </button>
-              ))}
+            <div className="mt-2">
+              <EmojiPickerDrawer
+                value={avatar}
+                onChange={setAvatar}
+                options={AVATARS}
+                title="Pick your avatar"
+              />
             </div>
           </div>
 

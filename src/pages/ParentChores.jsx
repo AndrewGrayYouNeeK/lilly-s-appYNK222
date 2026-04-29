@@ -11,8 +11,9 @@ import { Switch } from '@/components/ui/switch';
 import { Plus, Trash2, Sparkles, Camera } from 'lucide-react';
 import { difficultyStyle, formatMoney } from '@/lib/cq';
 import { toast } from 'sonner';
+import EmojiPickerDrawer from '@/components/EmojiPickerDrawer';
 
-const EMOJIS = ['🧹','🛏️','🍽️','🗑️','🐕','🪴','🧺','📚','🚿','🧼','🪟','🧸'];
+const EMOJIS = ['🧹','🛏️','🍽️','🗑️','🐕','🪴','🧺','📚','🚿','🧼','🪟','🧸','🍳','🧑‍🍳','🚽','🪥','👕','🧦','🚗','🍂'];
 
 export default function ParentChores() {
   const qc = useQueryClient();
@@ -109,12 +110,12 @@ export default function ParentChores() {
         <Card className="p-5 mb-4">
           <h3 className="font-display text-lg font-semibold mb-3">New chore</h3>
           <div className="space-y-3">
-            <Input placeholder="Title (e.g. Make your bed)" value={form.title} onChange={e => setForm({...form, title: e.target.value})} />
-            <Textarea placeholder="Short description" value={form.description} onChange={e => setForm({...form, description: e.target.value})} rows={2} />
+            <Input placeholder="Title (e.g. Make your bed)" value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="h-11" />
+            <Textarea placeholder="Short description" value={form.description} onChange={e => setForm({...form, description: e.target.value})} rows={2} className="min-h-[44px]" />
             <div className="grid grid-cols-2 gap-2">
-              <Input type="number" step="0.25" placeholder="Value" value={form.value} onChange={e => setForm({...form, value: e.target.value})} />
+              <Input type="number" step="0.25" placeholder="Value" value={form.value} onChange={e => setForm({...form, value: e.target.value})} className="h-11" />
               <Select value={form.difficulty} onValueChange={v => setForm({...form, difficulty: v})}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="easy">Easy</SelectItem>
                   <SelectItem value="medium">Medium</SelectItem>
@@ -124,13 +125,13 @@ export default function ParentChores() {
             </div>
             <div>
               <label className="text-xs text-muted-foreground">Emoji</label>
-              <div className="flex flex-wrap gap-1.5 mt-1.5">
-                {EMOJIS.map(e => (
-                  <button key={e} onClick={() => setForm({...form, emoji: e})}
-                    className={`text-xl w-10 h-10 rounded-lg ${form.emoji === e ? 'bg-secondary/20 ring-2 ring-secondary' : 'bg-muted'}`}>
-                    {e}
-                  </button>
-                ))}
+              <div className="mt-1.5">
+                <EmojiPickerDrawer
+                  value={form.emoji}
+                  onChange={(v) => setForm({ ...form, emoji: v })}
+                  options={EMOJIS}
+                  title="Pick a chore emoji"
+                />
               </div>
             </div>
             <div className="flex items-center justify-between rounded-xl border border-border bg-muted/40 p-3">
@@ -144,8 +145,8 @@ export default function ParentChores() {
               <Switch checked={form.requires_photo} onCheckedChange={v => setForm({...form, requires_photo: v})} />
             </div>
             <div className="flex gap-2 pt-1">
-              <Button variant="outline" className="flex-1" onClick={() => setShowForm(false)}>Cancel</Button>
-              <Button className="flex-1" onClick={submit}>Save chore</Button>
+              <Button variant="outline" className="flex-1 min-h-[44px]" onClick={() => setShowForm(false)}>Cancel</Button>
+              <Button className="flex-1 min-h-[44px]" onClick={submit}>Save chore</Button>
             </div>
           </div>
         </Card>
