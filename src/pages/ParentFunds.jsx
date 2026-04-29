@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import Shell from '@/components/Shell';
+import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -74,10 +75,7 @@ export default function ParentFunds() {
 
   return (
     <Shell role="parent">
-      <header className="mb-5">
-        <h1 className="font-display text-3xl font-bold text-primary">Family Funds</h1>
-        <p className="text-sm text-muted-foreground">Add real money to pay out chores instantly</p>
-      </header>
+      <Header title="Family Funds" />
 
       {/* Balance card */}
       <Card className="p-6 mb-4 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import Shell from '@/components/Shell';
+import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -62,13 +63,10 @@ export default function KidGoals() {
 
   return (
     <Shell role="kid">
-      <header className="flex items-center justify-between mb-5">
-        <div>
-          <h1 className="font-display text-3xl font-bold">Savings Goals</h1>
-          <p className="text-sm text-muted-foreground">What are you saving up for?</p>
-        </div>
-        <Button onClick={() => setShowForm(v => !v)} className="rounded-full"><Plus className="w-4 h-4 mr-1" />New</Button>
-      </header>
+      <Header
+        title="Savings Goals"
+        right={<Button onClick={() => setShowForm(v => !v)} className="rounded-full"><Plus className="w-4 h-4 mr-1" />New</Button>}
+      />
 
       {showForm && (
         <Card className="p-5 mb-4">

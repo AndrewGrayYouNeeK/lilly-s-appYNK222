@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import Shell from '@/components/Shell';
+import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -95,10 +96,7 @@ export default function ParentCashouts() {
 
   return (
     <Shell role="parent">
-      <header className="mb-5">
-        <h1 className="font-display text-3xl font-bold text-primary">Cashouts</h1>
-        <p className="text-sm text-muted-foreground">{pending.length} waiting · pay however you like</p>
-      </header>
+      <Header title="Cashouts" />
 
       {pending.length === 0 ? (
         <Card className="p-10 text-center mb-6">

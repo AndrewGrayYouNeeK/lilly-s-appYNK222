@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import Shell from '@/components/Shell';
+import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -76,12 +77,7 @@ export default function KidCashout() {
 
   return (
     <Shell role="kid">
-      <button onClick={() => nav(-1)} className="text-sm text-muted-foreground mb-4">← Back</button>
-
-      <header className="mb-5">
-        <h1 className="font-display text-3xl font-bold">Cash out</h1>
-        <p className="text-sm text-muted-foreground">Ask your parent to pay you</p>
-      </header>
+      <Header title="Cash out" />
 
       <Card className="p-5 mb-4 bg-primary text-primary-foreground">
         <div className="flex items-center gap-2 text-xs uppercase tracking-wider opacity-80">

@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import Shell from '@/components/Shell';
+import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
 import { Trophy } from 'lucide-react';
 import { subDays } from 'date-fns';
@@ -50,10 +51,7 @@ export default function Leaderboard() {
 
   return (
     <Shell role={role}>
-      <header className="mb-5">
-        <h1 className="font-display text-3xl font-bold text-primary">Leaderboard</h1>
-        <p className="text-sm text-muted-foreground">This week's chore champions</p>
-      </header>
+      <Header title="Leaderboard" />
 
       {rows.length === 0 ? (
         <Card className="p-10 text-center">

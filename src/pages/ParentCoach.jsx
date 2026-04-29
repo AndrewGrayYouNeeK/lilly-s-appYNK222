@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import Shell from '@/components/Shell';
+import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -66,17 +67,7 @@ export default function ParentCoach() {
 
   return (
     <Shell role="parent">
-      <header className="mb-4">
-        <div className="flex items-center gap-2 mb-1">
-          <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-primary-foreground" />
-          </div>
-          <div>
-            <h1 className="font-display text-2xl font-bold text-primary leading-none">Chore Coach</h1>
-            <p className="text-xs text-muted-foreground">AI helper for planning &amp; advice</p>
-          </div>
-        </div>
-      </header>
+      <Header title="Chore Coach" />
 
       <div ref={scrollRef} className="h-[60vh] overflow-y-auto rounded-2xl bg-muted/30 border border-border p-3 space-y-3 mb-3">
         {messages.length === 0 ? (

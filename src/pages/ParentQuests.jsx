@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import Shell from '@/components/Shell';
+import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -45,13 +46,10 @@ export default function ParentQuests() {
 
   return (
     <Shell role="parent">
-      <header className="flex items-center justify-between mb-5">
-        <div>
-          <h1 className="font-display text-3xl font-bold text-primary">Family Quests</h1>
-          <p className="text-sm text-muted-foreground">Shared goals the whole family works on</p>
-        </div>
-        <Button onClick={() => setShow(v => !v)} className="rounded-full"><Plus className="w-4 h-4 mr-1" />Add</Button>
-      </header>
+      <Header
+        title="Family Quests"
+        right={<Button onClick={() => setShow(v => !v)} className="rounded-full"><Plus className="w-4 h-4 mr-1" />Add</Button>}
+      />
 
       {show && (
         <Card className="p-5 mb-4">

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import Shell from '@/components/Shell';
+import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Camera, Upload, X, RefreshCw, CheckCircle2 } from 'lucide-react';
@@ -84,7 +85,7 @@ export default function ChoreDo() {
 
   return (
     <Shell role="kid">
-      <button onClick={() => nav(-1)} className="text-sm text-muted-foreground mb-4">← Back</button>
+      <Header title={claim.chore_title || 'Quest'} />
 
       <Card className="p-5 mb-4">
         <div className="flex items-center gap-3">

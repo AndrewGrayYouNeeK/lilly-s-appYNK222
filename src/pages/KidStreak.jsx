@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import Shell from '@/components/Shell';
+import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
 import StreakHeatmap from '@/components/StreakHeatmap';
 import { streakMultiplier } from '@/lib/cq';
@@ -33,9 +34,7 @@ export default function KidStreak() {
 
   return (
     <Shell role="kid">
-      <header className="mb-5">
-        <h1 className="font-display text-3xl font-bold">Your Streak</h1>
-      </header>
+      <Header title="Your Streak" />
 
       <Card className="p-6 mb-4 bg-gradient-to-br from-secondary to-accent text-primary-foreground">
         <div className="flex items-baseline gap-3">

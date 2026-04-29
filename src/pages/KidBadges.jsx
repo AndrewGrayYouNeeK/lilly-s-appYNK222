@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import Shell from '@/components/Shell';
+import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
 import AvatarRing from '@/components/AvatarRing';
 import { BADGE_CATALOG, tierStyle } from '@/lib/gamification';
@@ -23,9 +24,7 @@ export default function KidBadges() {
 
   return (
     <Shell role="kid">
-      <header className="mb-5">
-        <h1 className="font-display text-3xl font-bold">Achievements</h1>
-      </header>
+      <Header title="Achievements" />
 
       <Card className="p-5 mb-5">
         <AvatarRing emoji={me?.avatar_emoji || '🦊'} completedCount={approved.length} size={96} />

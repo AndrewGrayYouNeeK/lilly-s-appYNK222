@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import Shell from '@/components/Shell';
+import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { formatMoney } from '@/lib/cq';
@@ -61,10 +62,7 @@ export default function ParentReports() {
 
   return (
     <Shell role="parent">
-      <header className="mb-5">
-        <h1 className="font-display text-3xl font-bold text-primary">Reports</h1>
-        <p className="text-sm text-muted-foreground">How your family is doing</p>
-      </header>
+      <Header title="Reports" />
 
       <div className="grid grid-cols-3 gap-2 mb-4">
         <Stat icon={CheckCircle2} label="This week" value={weekChores} sub="chores" />
