@@ -55,8 +55,39 @@ export default function KidShop() {
         link: '/parent/shop',
       });
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['txs'] }); qc.invalidateQueries({ queryKey: ['purchases'] }); toast.success('Purchased! Waiting for parent.'); },
-    onError: (e) => toast.error(e.message),
+    onMutate: async (item) => {
+      if (balance < item.price) return;
+      await Promise.all([
+        qc.cancelQueries({ queryKey: ['txs', me?.email] }),
+        qc.cancelQueries({ queryKey: ['purchases', me?.email] }),
+      ]);
+      const prevTxs = qc.getQueryData(['txs', me?.email]);
+      const prevPurchases = qc.getQueryData(['purchases', me?.email]);
+      const now = new Date().toISOString();
+      qc.setQueryData(['txs', me?.email], (old = []) => [
+        { id: `temp-tx-${Date.now()}`, kid_email: me.email, family_id: me.family_id,
+          amount: item.price, type: 'spend', description: `Bought: ${item.title}`,
+          created_date: now, _optimistic: true },
+        ...old,
+      ]);
+      qc.setQueryData(['purchases', me?.email], (old = []) => [
+        { id: `temp-p-${Date.now()}`, family_id: me.family_id, kid_email: me.email,
+          item_id: item.id, item_title: item.title, item_emoji: item.emoji,
+          price: item.price, status: 'pending', created_date: now, _optimistic: true },
+        ...old,
+      ]);
+      return { prevTxs, prevPurchases };
+    },
+    onError: (e, _vars, ctx) => {
+      if (ctx?.prevTxs !== undefined) qc.setQueryData(['txs', me?.email], ctx.prevTxs);
+      if (ctx?.prevPurchases !== undefined) qc.setQueryData(['purchases', me?.email], ctx.prevPurchases);
+      toast.error(e.message);
+    },
+    onSuccess: () => toast.success('Purchased! Waiting for parent.'),
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ['txs'] });
+      qc.invalidateQueries({ queryKey: ['purchases'] });
+    },
   });
 
   return (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { LayoutDashboard, ListChecks, CheckSquare, Home, Wallet, Flame, Trophy, ShoppingBag, Gift, Medal, MessageCircle } from 'lucide-react';
@@ -22,7 +22,24 @@ const kidTabs = [
 
 export default function Shell({ role, children }) {
   const { pathname } = useLocation();
+  const nav = useNavigate();
   const tabs = role === 'parent' ? parentTabs : kidTabs;
+
+  const handleTabClick = (e, to) => {
+    // If we're already inside this tab's section but on a sub-route, reset to root.
+    const isRootTab = to === '/parent' || to === '/kid';
+    const inSection = isRootTab
+      ? pathname.startsWith(to) && pathname !== to
+      : pathname === to;
+    if (inSection || pathname === to) {
+      e.preventDefault();
+      if (pathname === to) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        nav(to);
+      }
+    }
+  };
 
   const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
 
@@ -56,6 +73,7 @@ export default function Shell({ role, children }) {
               <Link
                 key={t.to}
                 to={t.to}
+                onClick={(e) => handleTabClick(e, t.to)}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition bounce-tap ${
                   on ? 'bg-primary text-primary-foreground' : 'text-foreground/70 hover:text-foreground'
                 }`}

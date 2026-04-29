@@ -44,12 +44,26 @@ export default function ParentFunds() {
         actor_email: me.email,
       });
     },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['familyWallet', me.family_id] });
+    onMutate: async (amt) => {
+      const v = Math.round(Number(amt) * 100) / 100;
+      if (!v || v <= 0) return;
+      await qc.cancelQueries({ queryKey: ['familyWallet', me?.family_id] });
+      const prev = qc.getQueryData(['familyWallet', me?.family_id]);
+      qc.setQueryData(['familyWallet', me?.family_id], (old = []) => [
+        { id: `temp-d-${Date.now()}`, family_id: me.family_id,
+          amount: v, type: 'deposit', description: 'Deposit',
+          actor_email: me.email, created_date: new Date().toISOString(), _optimistic: true },
+        ...old,
+      ]);
       setAmount('');
-      toast.success('Funds added! 💰');
+      return { prev };
     },
-    onError: (e) => toast.error(e.message),
+    onError: (e, _vars, ctx) => {
+      if (ctx?.prev !== undefined) qc.setQueryData(['familyWallet', me?.family_id], ctx.prev);
+      toast.error(e.message);
+    },
+    onSuccess: () => toast.success('Funds added! 💰'),
+    onSettled: () => qc.invalidateQueries({ queryKey: ['familyWallet', me?.family_id] }),
   });
 
   const withdraw = useMutation({

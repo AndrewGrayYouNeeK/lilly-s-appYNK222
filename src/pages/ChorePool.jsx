@@ -52,7 +52,32 @@ export default function ChorePool() {
       });
       return c;
     },
-    onSuccess: (c) => { toast.success('Quest claimed!'); qc.invalidateQueries({ queryKey: ['myClaims'] }); nav(`/kid/do/${c.id}`); },
+    onMutate: async (chore) => {
+      await qc.cancelQueries({ queryKey: ['myClaims', me?.email] });
+      const prev = qc.getQueryData(['myClaims', me?.email]);
+      const optimistic = {
+        id: `temp-${Date.now()}`,
+        family_id: me.family_id,
+        chore_id: chore.id,
+        chore_title: chore.title,
+        chore_emoji: chore.emoji,
+        chore_value: chore.value,
+        kid_email: me.email,
+        kid_name: me.display_name || me.full_name,
+        status: 'claimed',
+        claim_date: today,
+        requires_photo: chore.requires_photo !== false,
+        _optimistic: true,
+      };
+      qc.setQueryData(['myClaims', me?.email], (old = []) => [...old, optimistic]);
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.prev) qc.setQueryData(['myClaims', me?.email], ctx.prev);
+      toast.error('Could not claim — try again');
+    },
+    onSuccess: (c) => { toast.success('Quest claimed!'); nav(`/kid/do/${c.id}`); },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['myClaims'] }),
   });
 
   const available = chores.filter(c => !openClaimedIds.includes(c.id));

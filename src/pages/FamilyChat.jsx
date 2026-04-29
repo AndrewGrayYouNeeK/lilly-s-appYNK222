@@ -69,7 +69,10 @@ export default function FamilyChat() {
         <div ref={bottomRef} />
       </div>
 
-      <div className="fixed bottom-24 left-0 right-0 px-5 z-30">
+      <div
+        className="fixed left-0 right-0 px-5 z-30"
+        style={{ bottom: 'calc(6rem + env(safe-area-inset-bottom))' }}
+      >
         <div className="max-w-xl mx-auto glass border border-border shadow-lg rounded-full p-1.5">
           <MessageComposer onSend={(t) => send.mutate(t)} disabled={send.isPending} />
         </div>
