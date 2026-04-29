@@ -30,6 +30,7 @@ import ParentCoach from '@/pages/ParentCoach';
 import ParentFunds from '@/pages/ParentFunds';
 import ParentCashouts from '@/pages/ParentCashouts';
 import KidCashout from '@/pages/KidCashout';
+import Settings from '@/pages/Settings';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -74,6 +75,8 @@ const AuthenticatedApp = () => {
       <Route path="/parent/funds" element={<ParentFunds />} />
       <Route path="/parent/cashouts" element={<ParentCashouts />} />
       <Route path="/kid/cashout" element={<KidCashout />} />
+      <Route path="/parent/settings" element={<Settings />} />
+      <Route path="/kid/settings" element={<Settings />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

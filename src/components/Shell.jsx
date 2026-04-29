@@ -27,14 +27,26 @@ export default function Shell({ role, children }) {
   const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      <div className="fixed top-3 right-3 z-40">
+    <div
+      className="min-h-screen bg-background"
+      style={{
+        paddingBottom: 'calc(6rem + env(safe-area-inset-bottom))',
+        paddingTop: 'env(safe-area-inset-top)',
+      }}
+    >
+      <div
+        className="fixed right-3 z-40"
+        style={{ top: 'calc(0.75rem + env(safe-area-inset-top))' }}
+      >
         <div className="glass rounded-full border border-border shadow">
           <NotificationBell email={me?.email} />
         </div>
       </div>
       <main className="max-w-xl mx-auto px-5 pt-6">{children}</main>
-      <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
+      <nav
+        className="fixed left-1/2 -translate-x-1/2 z-40"
+        style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom))' }}
+      >
         <div className="glass border border-border shadow-xl rounded-full px-2 py-2 flex gap-1">
           {tabs.map(t => {
             const active = pathname === t.to || (t.to !== '/parent' && t.to !== '/kid' && pathname.startsWith(t.to));

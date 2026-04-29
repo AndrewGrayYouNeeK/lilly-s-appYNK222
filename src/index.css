@@ -77,11 +77,35 @@
 
 @layer base {
   * { @apply border-border outline-ring/50; }
+
+  html, body {
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    user-select: none;
+    -webkit-user-select: none;
   }
+
+  /* Allow text selection on actual content */
+  p, h1, h2, h3, h4, h5, h6, span, input, textarea, [contenteditable="true"], .selectable {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  input, textarea {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  button, a, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   h1, h2, h3, .font-display {
     font-family: var(--font-display);
     letter-spacing: -0.02em;

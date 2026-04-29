@@ -1,17 +1,20 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import Shell from '@/components/Shell';
+import PullToRefresh from '@/components/PullToRefresh';
 import { Card } from '@/components/ui/card';
 import AvatarRing from '@/components/AvatarRing';
 import DailyTip from '@/components/DailyTip';
 import { Progress } from '@/components/ui/progress';
-import { Wallet, Flame, Trophy, ChevronRight, Target } from 'lucide-react';
+import { Wallet, Flame, Trophy, ChevronRight, Target, Settings as SettingsIcon } from 'lucide-react';
 import { formatMoney, streakMultiplier, todayISO } from '@/lib/cq';
 
 export default function KidHome() {
   const nav = useNavigate();
+  const qc = useQueryClient();
+  const handleRefresh = async () => { await qc.invalidateQueries(); };
   const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
   const { data: family } = useQuery({
     queryKey: ['family', me?.family_id],
@@ -57,8 +60,18 @@ export default function KidHome() {
 
   return (
     <Shell role="kid">
+      <PullToRefresh onRefresh={handleRefresh}>
       <header className="mb-5">
-        <div className="text-xs text-muted-foreground mb-1">Hey there</div>
+        <div className="flex items-start justify-between mb-1">
+          <div className="text-xs text-muted-foreground">Hey there</div>
+          <button
+            onClick={() => nav('/kid/settings')}
+            aria-label="Settings"
+            className="bounce-tap w-9 h-9 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"
+          >
+            <SettingsIcon className="w-4 h-4" />
+          </button>
+        </div>
         <h1 className="font-display text-2xl font-bold mb-4">{me?.display_name || me?.full_name}</h1>
         <AvatarRing emoji={me?.avatar_emoji || '🦊'} completedCount={approvedCount} size={88} />
       </header>
@@ -156,6 +169,7 @@ export default function KidHome() {
           </Card>
         );
       })()}
+      </PullToRefresh>
     </Shell>
   );
 }

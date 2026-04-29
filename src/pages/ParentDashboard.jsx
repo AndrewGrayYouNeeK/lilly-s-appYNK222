@@ -1,17 +1,23 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import Shell from '@/components/Shell';
+import PullToRefresh from '@/components/PullToRefresh';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Copy, CheckSquare, TrendingUp, Users, Plus, BarChart3, Medal, Baby, Sparkles, Wallet, Send } from 'lucide-react';
+import { Copy, CheckSquare, TrendingUp, Users, Plus, BarChart3, Medal, Baby, Sparkles, Wallet, Send, Settings as SettingsIcon } from 'lucide-react';
 import { formatMoney } from '@/lib/cq';
 import { computeFamilyBalance, loadFamilyWalletTxs } from '@/lib/familyWallet';
 import { toast } from 'sonner';
 
 export default function ParentDashboard() {
   const nav = useNavigate();
+  const qc = useQueryClient();
+
+  const handleRefresh = async () => {
+    await qc.invalidateQueries();
+  };
 
   const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
   const { data: family } = useQuery({
@@ -54,9 +60,19 @@ export default function ParentDashboard() {
 
   return (
     <Shell role="parent">
-      <header className="mb-6">
-        <p className="text-sm text-muted-foreground">Welcome back</p>
-        <h1 className="font-display text-3xl font-bold text-primary">{family?.name || 'Your family'}</h1>
+      <PullToRefresh onRefresh={handleRefresh}>
+      <header className="mb-6 flex items-end justify-between gap-3">
+        <div>
+          <p className="text-sm text-muted-foreground">Welcome back</p>
+          <h1 className="font-display text-3xl font-bold text-primary">{family?.name || 'Your family'}</h1>
+        </div>
+        <button
+          onClick={() => nav('/parent/settings')}
+          aria-label="Settings"
+          className="bounce-tap w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"
+        >
+          <SettingsIcon className="w-4 h-4" />
+        </button>
       </header>
 
       {/* Invite code card */}
@@ -190,6 +206,7 @@ export default function ParentDashboard() {
           </div>
         )}
       </div>
+      </PullToRefresh>
     </Shell>
   );
 }
