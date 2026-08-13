@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import Shell from '@/components/Shell';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,15 +18,15 @@ import { toast } from 'sonner';
 
 export default function ParentApprovals() {
   const qc = useQueryClient();
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => api.auth.me() });
   const { data: family } = useQuery({
     queryKey: ['family', me?.family_id],
-    queryFn: () => base44.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
+    queryFn: () => api.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
     enabled: !!me?.family_id,
   });
   const { data: pending = [] } = useQuery({
     queryKey: ['pending', me?.family_id],
-    queryFn: () => base44.entities.ChoreClaim.filter({ family_id: me.family_id, status: 'submitted' }, '-created_date'),
+    queryFn: () => api.entities.ChoreClaim.filter({ family_id: me.family_id, status: 'submitted' }, '-created_date'),
     enabled: !!me?.family_id,
   });
   const { data: familyTxs = [] } = useQuery({
@@ -41,7 +41,7 @@ export default function ParentApprovals() {
   const approve = useMutation({
     mutationFn: async (claim) => {
       // update / bump streak first, compute multiplier
-      const streaks = await base44.entities.Streak.filter({ kid_email: claim.kid_email, family_id: claim.family_id });
+      const streaks = await api.entities.Streak.filter({ kid_email: claim.kid_email, family_id: claim.family_id });
       let streak = streaks[0];
       const today = todayISO();
       let newCount = 1;
@@ -52,13 +52,13 @@ export default function ParentApprovals() {
           const diff = last ? Math.round((new Date(today) - last) / 86400000) : 999;
           newCount = diff === 1 ? streak.current_count + 1 : 1;
         }
-        await base44.entities.Streak.update(streak.id, {
+        await api.entities.Streak.update(streak.id, {
           current_count: newCount,
           longest_count: Math.max(streak.longest_count || 0, newCount),
           last_completed_date: today,
         });
       } else {
-        streak = await base44.entities.Streak.create({
+        streak = await api.entities.Streak.create({
           kid_email: claim.kid_email, family_id: claim.family_id,
           current_count: 1, longest_count: 1, last_completed_date: today,
         });
@@ -77,7 +77,7 @@ export default function ParentApprovals() {
       }
 
       // Deduct from family pool
-      await base44.entities.FamilyWalletTransaction.create({
+      await api.entities.FamilyWalletTransaction.create({
         family_id: claim.family_id,
         amount: -paid,
         type: 'payout',
@@ -87,27 +87,27 @@ export default function ParentApprovals() {
         claim_id: claim.id,
       });
 
-      await base44.entities.ChoreClaim.update(claim.id, { status: 'approved', paid_amount: paid });
-      await base44.entities.WalletTransaction.create({
+      await api.entities.ChoreClaim.update(claim.id, { status: 'approved', paid_amount: paid });
+      await api.entities.WalletTransaction.create({
         kid_email: claim.kid_email, family_id: claim.family_id,
         amount: base, type: 'earn', description: claim.chore_title, claim_id: claim.id,
       });
       if (bonus > 0) {
-        await base44.entities.WalletTransaction.create({
+        await api.entities.WalletTransaction.create({
           kid_email: claim.kid_email, family_id: claim.family_id,
           amount: bonus, type: 'bonus', description: `Streak bonus (${newCount} days 🔥)`, claim_id: claim.id,
         });
       }
 
       // Auto-allocate to savings goals
-      const goals = await base44.entities.SavingsGoal.filter({ kid_email: claim.kid_email, status: 'active' });
+      const goals = await api.entities.SavingsGoal.filter({ kid_email: claim.kid_email, status: 'active' });
       for (const g of goals) {
         if (!g.allocation_pct) continue;
         const add = Math.round(paid * (g.allocation_pct / 100) * 100) / 100;
         if (add <= 0) continue;
         const newSaved = Math.round((g.saved_amount + add) * 100) / 100;
         const achieved = newSaved >= g.target_amount;
-        await base44.entities.SavingsGoal.update(g.id, {
+        await api.entities.SavingsGoal.update(g.id, {
           saved_amount: newSaved,
           status: achieved ? 'achieved' : 'active',
         });
@@ -139,7 +139,7 @@ export default function ParentApprovals() {
 
   const redo = useMutation({
     mutationFn: async ({ claim, note }) => {
-      await base44.entities.ChoreClaim.update(claim.id, { status: 'redo', review_comment: note });
+      await api.entities.ChoreClaim.update(claim.id, { status: 'redo', review_comment: note });
       await notify({
         recipient_email: claim.kid_email, family_id: claim.family_id,
         type: 'redo', emoji: '🔁',

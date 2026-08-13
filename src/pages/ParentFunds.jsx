@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import Shell from '@/components/Shell';
 import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
@@ -17,10 +17,10 @@ export default function ParentFunds() {
   const qc = useQueryClient();
   const [amount, setAmount] = useState('');
 
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => api.auth.me() });
   const { data: family } = useQuery({
     queryKey: ['family', me?.family_id],
-    queryFn: () => base44.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
+    queryFn: () => api.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
     enabled: !!me?.family_id,
   });
   const { data: txs = [] } = useQuery({
@@ -36,7 +36,7 @@ export default function ParentFunds() {
     mutationFn: async (amt) => {
       const v = Math.round(Number(amt) * 100) / 100;
       if (!v || v <= 0) throw new Error('Enter a valid amount');
-      await base44.entities.FamilyWalletTransaction.create({
+      await api.entities.FamilyWalletTransaction.create({
         family_id: me.family_id,
         amount: v,
         type: 'deposit',
@@ -71,7 +71,7 @@ export default function ParentFunds() {
       const v = Math.round(Number(amt) * 100) / 100;
       if (!v || v <= 0) throw new Error('Enter a valid amount');
       if (v > balance) throw new Error('Not enough in pool');
-      await base44.entities.FamilyWalletTransaction.create({
+      await api.entities.FamilyWalletTransaction.create({
         family_id: me.family_id,
         amount: -v,
         type: 'adjustment',

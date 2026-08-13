@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -23,7 +23,7 @@ export default function Onboarding() {
 
   useEffect(() => {
     fetchMe().then(u => {
-      if (!u) { base44.auth.redirectToLogin(); return; }
+      if (!u) { api.auth.redirectToLogin(); return; }
       if (u.app_role === 'parent') nav('/parent');
       else if (u.app_role === 'kid') nav('/kid');
       else { setMe(u); setDisplayName(u.full_name || ''); }
@@ -34,11 +34,11 @@ export default function Onboarding() {
     if (!familyName.trim()) return;
     setLoading(true);
     const code = genInviteCode();
-    const fam = await base44.entities.Family.create({
+    const fam = await api.entities.Family.create({
       name: familyName.trim(),
       invite_code: code,
     });
-    await base44.auth.updateMe({
+    await api.auth.updateMe({
       app_role: 'parent',
       family_id: fam.id,
       display_name: displayName || me.full_name,
@@ -50,16 +50,16 @@ export default function Onboarding() {
   const joinFamily = async () => {
     if (!inviteCode.trim() || !displayName.trim()) return;
     setLoading(true);
-    const fams = await base44.entities.Family.filter({ invite_code: inviteCode.trim().toUpperCase() });
+    const fams = await api.entities.Family.filter({ invite_code: inviteCode.trim().toUpperCase() });
     if (!fams.length) { alert('Code not found. Ask a parent for your family code.'); setLoading(false); return; }
-    await base44.auth.updateMe({
+    await api.auth.updateMe({
       app_role: 'kid',
       family_id: fams[0].id,
       display_name: displayName.trim(),
       age: Number(age) || undefined,
       avatar_emoji: avatar,
     });
-    await base44.entities.Streak.create({
+    await api.entities.Streak.create({
       kid_email: me.email, family_id: fams[0].id, current_count: 0, longest_count: 0,
     });
     nav('/kid');

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import { useQueryClient } from '@tanstack/react-query';
 import { SmilePlus } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -22,7 +22,7 @@ export default function MessageBubble({ msg, me, invalidateKey }) {
     } else {
       reactions[emoji] = [...list, me.email];
     }
-    await base44.entities.Message.update(msg.id, { reactions });
+    await api.entities.Message.update(msg.id, { reactions });
     qc.invalidateQueries({ queryKey: invalidateKey });
   };
 

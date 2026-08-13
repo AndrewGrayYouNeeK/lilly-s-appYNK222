@@ -1,39 +1,62 @@
-**Welcome to your Base44 project** 
+# Lilly's app
 
-**About**
+A family chore and rewards app — chores kids actually want to do.
 
-View and Edit  your app on [Base44.com](http://Base44.com) 
+## Stack
 
-This project contains everything you need to run your app locally.
+- **Frontend:** React + Vite + Tailwind CSS
+- **Backend:** [Supabase](https://supabase.com) (Postgres, Auth, Storage, Edge Functions)
 
-**Edit the code in your local development environment**
+## Setup
 
-Any change pushed to the repo will also be reflected in the Base44 Builder.
+1. Clone the repo and install dependencies:
 
-**Prerequisites:** 
-
-1. Clone the repository using the project's Git URL 
-2. Navigate to the project directory
-3. Install dependencies: `npm install`
-4. Create an `.env.local` file and set the right environment variables
-
-```
-VITE_BASE44_APP_ID=your_app_id
-VITE_BASE44_APP_BASE_URL=your_backend_url
-
-e.g.
-VITE_BASE44_APP_ID=cbef744a8545c389ef439ea6
-VITE_BASE44_APP_BASE_URL=https://my-to-do-list-81bfaad7.base44.app
+```bash
+npm install
 ```
 
-Run the app: `npm run dev`
+2. Create a [Supabase project](https://supabase.com/dashboard) (or run locally with `npx supabase start`).
 
-**Publish your changes**
+3. Copy `.env.example` to `.env.local` and fill in your Supabase credentials:
 
-Open [Base44.com](http://Base44.com) and click on Publish.
+```
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+```
 
-**Docs & Support**
+4. Apply the database migration:
 
-Documentation: [https://docs.base44.com/Integrations/Using-GitHub](https://docs.base44.com/Integrations/Using-GitHub)
+```bash
+npx supabase db push
+```
 
-Support: [https://app.base44.com/support](https://app.base44.com/support)
+   Or run the SQL in `supabase/migrations/20260813000000_initial_schema.sql` against your project.
+
+5. Deploy edge functions (optional, for AI features):
+
+```bash
+npx supabase functions deploy invoke-llm
+npx supabase functions deploy chore-coach
+npx supabase functions deploy verify-chore-photos
+npx supabase functions deploy pay-allowances
+```
+
+   Set `OPENAI_API_KEY` in your Supabase project secrets for AI-powered features.
+
+6. Start the dev server:
+
+```bash
+npm run dev
+```
+
+## Features
+
+- Parent dashboard — create chores, approve submissions, manage allowances
+- Kid experience — claim chores, earn rewards, shop, streaks, badges
+- Family chat and quest system
+- AI Chore Coach (with OpenAI)
+- Photo verification for chore submissions
+
+## Support
+
+Contact: support@lillysapp.com

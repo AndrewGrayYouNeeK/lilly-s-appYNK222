@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import Shell from '@/components/Shell';
 import PullToRefresh from '@/components/PullToRefresh';
 import { Card } from '@/components/ui/card';
@@ -19,20 +19,20 @@ export default function ParentDashboard() {
     await qc.invalidateQueries();
   };
 
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => api.auth.me() });
   const { data: family } = useQuery({
     queryKey: ['family', me?.family_id],
-    queryFn: () => base44.entities.Family.filter({ id: me.family_id }).then(r => r[0] || null),
+    queryFn: () => api.entities.Family.filter({ id: me.family_id }).then(r => r[0] || null),
     enabled: !!me?.family_id,
   });
   const { data: kids = [] } = useQuery({
     queryKey: ['kids', me?.family_id],
-    queryFn: () => base44.entities.User.filter({ family_id: me.family_id, app_role: 'kid' }),
+    queryFn: () => api.entities.User.filter({ family_id: me.family_id, app_role: 'kid' }),
     enabled: !!me?.family_id,
   });
   const { data: claims = [] } = useQuery({
     queryKey: ['claims', me?.family_id],
-    queryFn: () => base44.entities.ChoreClaim.filter({ family_id: me.family_id }, '-created_date', 50),
+    queryFn: () => api.entities.ChoreClaim.filter({ family_id: me.family_id }, '-created_date', 50),
     enabled: !!me?.family_id,
   });
   const { data: familyTxs = [] } = useQuery({
@@ -42,7 +42,7 @@ export default function ParentDashboard() {
   });
   const { data: cashoutReqs = [] } = useQuery({
     queryKey: ['parentCashouts', me?.family_id],
-    queryFn: () => base44.entities.CashoutRequest.filter({ family_id: me.family_id, status: 'pending' }),
+    queryFn: () => api.entities.CashoutRequest.filter({ family_id: me.family_id, status: 'pending' }),
     enabled: !!me?.family_id,
   });
   const poolBalance = computeFamilyBalance(familyTxs);

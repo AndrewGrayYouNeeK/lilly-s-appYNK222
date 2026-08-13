@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import Shell from '@/components/Shell';
 import PullToRefresh from '@/components/PullToRefresh';
 import { Card } from '@/components/ui/card';
@@ -15,35 +15,35 @@ export default function KidHome() {
   const nav = useNavigate();
   const qc = useQueryClient();
   const handleRefresh = async () => { await qc.invalidateQueries(); };
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => api.auth.me() });
   const { data: family } = useQuery({
     queryKey: ['family', me?.family_id],
-    queryFn: () => base44.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
+    queryFn: () => api.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
     enabled: !!me?.family_id,
   });
   const { data: streak } = useQuery({
     queryKey: ['streak', me?.email],
-    queryFn: () => base44.entities.Streak.filter({ kid_email: me.email }).then(r => r[0]),
+    queryFn: () => api.entities.Streak.filter({ kid_email: me.email }).then(r => r[0]),
     enabled: !!me?.email,
   });
   const { data: txs = [] } = useQuery({
     queryKey: ['txs', me?.email],
-    queryFn: () => base44.entities.WalletTransaction.filter({ kid_email: me.email }),
+    queryFn: () => api.entities.WalletTransaction.filter({ kid_email: me.email }),
     enabled: !!me?.email,
   });
   const { data: myClaims = [] } = useQuery({
     queryKey: ['myClaims', me?.email],
-    queryFn: () => base44.entities.ChoreClaim.filter({ kid_email: me.email }, '-created_date'),
+    queryFn: () => api.entities.ChoreClaim.filter({ kid_email: me.email }, '-created_date'),
     enabled: !!me?.email,
   });
   const { data: familyQuests = [] } = useQuery({
     queryKey: ['quests', me?.family_id],
-    queryFn: () => base44.entities.FamilyQuest.filter({ family_id: me.family_id, status: 'active' }),
+    queryFn: () => api.entities.FamilyQuest.filter({ family_id: me.family_id, status: 'active' }),
     enabled: !!me?.family_id,
   });
   const { data: familyApproved = [] } = useQuery({
     queryKey: ['familyApproved', me?.family_id],
-    queryFn: () => base44.entities.ChoreClaim.filter({ family_id: me.family_id, status: 'approved' }),
+    queryFn: () => api.entities.ChoreClaim.filter({ family_id: me.family_id, status: 'approved' }),
     enabled: !!me?.family_id,
   });
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import Shell from '@/components/Shell';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,25 +11,25 @@ import { ShoppingBag, Clock } from 'lucide-react';
 
 export default function KidShop() {
   const qc = useQueryClient();
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => api.auth.me() });
   const { data: family } = useQuery({
     queryKey: ['family', me?.family_id],
-    queryFn: () => base44.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
+    queryFn: () => api.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
     enabled: !!me?.family_id,
   });
   const { data: items = [] } = useQuery({
     queryKey: ['shop', me?.family_id],
-    queryFn: () => base44.entities.ShopItem.filter({ family_id: me.family_id, active: true }),
+    queryFn: () => api.entities.ShopItem.filter({ family_id: me.family_id, active: true }),
     enabled: !!me?.family_id,
   });
   const { data: txs = [] } = useQuery({
     queryKey: ['txs', me?.email],
-    queryFn: () => base44.entities.WalletTransaction.filter({ kid_email: me.email }),
+    queryFn: () => api.entities.WalletTransaction.filter({ kid_email: me.email }),
     enabled: !!me?.email,
   });
   const { data: purchases = [] } = useQuery({
     queryKey: ['purchases', me?.email],
-    queryFn: () => base44.entities.Purchase.filter({ kid_email: me.email }, '-created_date'),
+    queryFn: () => api.entities.Purchase.filter({ kid_email: me.email }, '-created_date'),
     enabled: !!me?.email,
   });
 
@@ -39,12 +39,12 @@ export default function KidShop() {
   const buy = useMutation({
     mutationFn: async (item) => {
       if (balance < item.price) throw new Error('Not enough funds');
-      await base44.entities.Purchase.create({
+      await api.entities.Purchase.create({
         family_id: me.family_id, kid_email: me.email, kid_name: me.display_name || me.full_name,
         item_id: item.id, item_title: item.title, item_emoji: item.emoji,
         price: item.price, status: 'pending',
       });
-      await base44.entities.WalletTransaction.create({
+      await api.entities.WalletTransaction.create({
         kid_email: me.email, family_id: me.family_id,
         amount: item.price, type: 'spend', description: `Bought: ${item.title}`,
       });

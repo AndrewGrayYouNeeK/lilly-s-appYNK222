@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import Shell from '@/components/Shell';
 import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
@@ -15,15 +15,15 @@ const EMOJIS = ['🎯','🚲','🎮','📱','🎸','⚽','🎨','📚','🛹','�
 
 export default function KidGoals() {
   const qc = useQueryClient();
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => api.auth.me() });
   const { data: family } = useQuery({
     queryKey: ['family', me?.family_id],
-    queryFn: () => base44.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
+    queryFn: () => api.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
     enabled: !!me?.family_id,
   });
   const { data: goals = [] } = useQuery({
     queryKey: ['goals', me?.email],
-    queryFn: () => base44.entities.SavingsGoal.filter({ kid_email: me.email }, '-created_date'),
+    queryFn: () => api.entities.SavingsGoal.filter({ kid_email: me.email }, '-created_date'),
     enabled: !!me?.email,
   });
 
@@ -31,7 +31,7 @@ export default function KidGoals() {
   const [form, setForm] = useState({ title: '', target_amount: '', emoji: '🎯', allocation_pct: 20 });
 
   const create = useMutation({
-    mutationFn: () => base44.entities.SavingsGoal.create({
+    mutationFn: () => api.entities.SavingsGoal.create({
       family_id: me.family_id,
       kid_email: me.email,
       title: form.title.trim(),
@@ -50,7 +50,7 @@ export default function KidGoals() {
   });
 
   const remove = useMutation({
-    mutationFn: (id) => base44.entities.SavingsGoal.delete(id),
+    mutationFn: (id) => api.entities.SavingsGoal.delete(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['goals'] }),
   });
 

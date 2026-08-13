@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import Shell from '@/components/Shell';
 import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
@@ -21,16 +21,16 @@ export default function ChoreDo() {
 
   const { data: claim, refetch } = useQuery({
     queryKey: ['claim', id],
-    queryFn: () => base44.entities.ChoreClaim.filter({ id }).then(r => r[0]),
+    queryFn: () => api.entities.ChoreClaim.filter({ id }).then(r => r[0]),
   });
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => api.auth.me() });
 
   if (!claim) return <Shell role="kid"><div className="text-center py-10 text-muted-foreground">Loading…</div></Shell>;
 
   const needsPhoto = claim.requires_photo !== false;
 
   const markDoneNoPhoto = async () => {
-    await base44.entities.ChoreClaim.update(id, { status: 'submitted' });
+    await api.entities.ChoreClaim.update(id, { status: 'submitted' });
     qc.invalidateQueries({ queryKey: ['myClaims'] });
     qc.invalidateQueries({ queryKey: ['pending'] });
     await notifyParents({
@@ -46,11 +46,11 @@ export default function ChoreDo() {
   const uploadPhoto = async (file, which) => {
     setUploading(true);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const { file_url } = await api.integrations.Core.UploadFile({ file });
       const update = which === 'before'
         ? { before_photo_url: file_url, status: 'before_done' }
         : { after_photo_url: file_url, status: 'submitted', ai_verdict: 'pending' };
-      await base44.entities.ChoreClaim.update(id, update);
+      await api.entities.ChoreClaim.update(id, update);
       await refetch();
       qc.invalidateQueries({ queryKey: ['myClaims'] });
       qc.invalidateQueries({ queryKey: ['pending'] });
@@ -74,7 +74,7 @@ export default function ChoreDo() {
 
   const cancel = async () => {
     if (!confirm('Cancel this quest?')) return;
-    await base44.entities.ChoreClaim.delete(id);
+    await api.entities.ChoreClaim.delete(id);
     qc.invalidateQueries({ queryKey: ['myClaims'] });
     nav('/kid');
   };
