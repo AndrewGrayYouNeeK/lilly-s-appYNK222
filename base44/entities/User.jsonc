@@ -23,5 +23,11 @@
     "display_name": {
       "type": "string"
     }
-  }
+  },
+  "required": [
+    "app_role",
+    "family_id",
+    "age",
+    "display_name"
+  ]
 }

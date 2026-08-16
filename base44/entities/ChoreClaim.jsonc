@@ -77,5 +77,62 @@
     "family_id",
     "chore_id",
     "kid_email"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "data.kid_email": "{{user.email}}",
+      "data.family_id": "{{user.data.family_id}}",
+      "user_condition": {
+        "app_role": "kid"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "data.family_id": "{{user.data.family_id}}",
+          "user_condition": {
+            "app_role": "parent"
+          }
+        },
+        {
+          "data.kid_email": "{{user.email}}",
+          "user_condition": {
+            "app_role": "kid"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.family_id": "{{user.data.family_id}}",
+          "user_condition": {
+            "app_role": "parent"
+          }
+        },
+        {
+          "data.kid_email": "{{user.email}}",
+          "user_condition": {
+            "app_role": "kid"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.family_id": "{{user.data.family_id}}",
+          "user_condition": {
+            "app_role": "parent"
+          }
+        },
+        {
+          "data.kid_email": "{{user.email}}",
+          "user_condition": {
+            "app_role": "kid"
+          }
+        }
+      ]
+    }
+  }
 }
