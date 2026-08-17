@@ -393,6 +393,12 @@ create policy coach_msg_insert on public.coach_messages for insert with check (
   conversation_id in (select id from public.coach_conversations where user_id = auth.uid())
 );
 
+-- Expose public tables to Data API roles. Required when auto_expose_new_tables is off
+-- (Supabase default since 2026-05-30). RLS policies above still enforce row access.
+grant usage on schema public to anon, authenticated, service_role;
+grant select, insert, update, delete on all tables in schema public
+  to anon, authenticated, service_role;
+
 -- Seed default badges
 insert into public.badges (key, title, description, emoji, tier) values
   ('first_quest', 'First Quest', 'Completed your first chore', '⭐', 'bronze'),
