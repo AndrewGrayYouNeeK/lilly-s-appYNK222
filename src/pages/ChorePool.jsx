@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import Shell from '@/components/Shell';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,20 +11,20 @@ import { toast } from 'sonner';
 export default function ChorePool() {
   const nav = useNavigate();
   const qc = useQueryClient();
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => api.auth.me() });
   const { data: family } = useQuery({
     queryKey: ['family', me?.family_id],
-    queryFn: () => base44.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
+    queryFn: () => api.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
     enabled: !!me?.family_id,
   });
   const { data: chores = [] } = useQuery({
     queryKey: ['pool', me?.family_id],
-    queryFn: () => base44.entities.Chore.filter({ family_id: me.family_id, active: true }),
+    queryFn: () => api.entities.Chore.filter({ family_id: me.family_id, active: true }),
     enabled: !!me?.family_id,
   });
   const { data: myClaims = [] } = useQuery({
     queryKey: ['myClaims', me?.email],
-    queryFn: () => base44.entities.ChoreClaim.filter({ kid_email: me.email }),
+    queryFn: () => api.entities.ChoreClaim.filter({ kid_email: me.email }),
     enabled: !!me?.email,
   });
 
@@ -38,7 +38,7 @@ export default function ChorePool() {
 
   const claim = useMutation({
     mutationFn: async (chore) => {
-      const c = await base44.entities.ChoreClaim.create({
+      const c = await api.entities.ChoreClaim.create({
         family_id: me.family_id,
         chore_id: chore.id,
         chore_title: chore.title,

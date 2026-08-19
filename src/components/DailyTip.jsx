@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import { Card } from '@/components/ui/card';
 import { Lightbulb, X } from 'lucide-react';
 import { todayISO } from '@/lib/cq';
@@ -30,7 +30,7 @@ export default function DailyTip({ age }) {
     // try to fetch a personalized one in background
     (async () => {
       try {
-        const res = await base44.integrations.Core.InvokeLLM({
+        const res = await api.integrations.Core.InvokeLLM({
           prompt: `Give one short (under 20 words) fun educational tip for a ${age || 10}-year-old about money, saving, responsibility, or family life. Output plain text, no quotes.`,
           response_json_schema: { type: 'object', properties: { fact: { type: 'string' }, tag: { type: 'string' } } },
         });

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import Shell from '@/components/Shell';
 import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
@@ -15,15 +15,15 @@ const EMOJIS = ['🏆','🎬','🍕','🎮','🏖️','🍦','🎳','🚗','🎢
 
 export default function ParentQuests() {
   const qc = useQueryClient();
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => api.auth.me() });
   const { data: quests = [] } = useQuery({
     queryKey: ['quests', me?.family_id],
-    queryFn: () => base44.entities.FamilyQuest.filter({ family_id: me.family_id }, '-created_date'),
+    queryFn: () => api.entities.FamilyQuest.filter({ family_id: me.family_id }, '-created_date'),
     enabled: !!me?.family_id,
   });
   const { data: claims = [] } = useQuery({
     queryKey: ['claimsApproved', me?.family_id],
-    queryFn: () => base44.entities.ChoreClaim.filter({ family_id: me.family_id, status: 'approved' }),
+    queryFn: () => api.entities.ChoreClaim.filter({ family_id: me.family_id, status: 'approved' }),
     enabled: !!me?.family_id,
   });
 
@@ -31,11 +31,11 @@ export default function ParentQuests() {
   const [show, setShow] = useState(false);
 
   const add = useMutation({
-    mutationFn: (d) => base44.entities.FamilyQuest.create({ ...d, family_id: me.family_id, status: 'active' }),
+    mutationFn: (d) => api.entities.FamilyQuest.create({ ...d, family_id: me.family_id, status: 'active' }),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['quests'] }); setShow(false); setForm({ title:'', description:'', target_count:'', reward:'', emoji:'🏆' }); toast.success('Family quest started!'); },
   });
   const del = useMutation({
-    mutationFn: (id) => base44.entities.FamilyQuest.delete(id),
+    mutationFn: (id) => api.entities.FamilyQuest.delete(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['quests'] }),
   });
 

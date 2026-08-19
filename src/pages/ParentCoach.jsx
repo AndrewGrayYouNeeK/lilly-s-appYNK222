@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import Shell from '@/components/Shell';
 import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
@@ -18,7 +18,7 @@ const STARTERS = [
 ];
 
 export default function ParentCoach() {
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => api.auth.me() });
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -28,7 +28,7 @@ export default function ParentCoach() {
   // Init conversation
   useEffect(() => {
     (async () => {
-      const c = await base44.agents.createConversation({
+      const c = await api.agents.createConversation({
         agent_name: 'chore_coach',
         metadata: { name: `Coach · ${new Date().toLocaleDateString()}` },
       });
@@ -40,7 +40,7 @@ export default function ParentCoach() {
   // Subscribe to streaming updates
   useEffect(() => {
     if (!conversation?.id) return;
-    const unsub = base44.agents.subscribeToConversation(conversation.id, (data) => {
+    const unsub = api.agents.subscribeToConversation(conversation.id, (data) => {
       setMessages(data.messages || []);
       const last = (data.messages || []).slice(-1)[0];
       if (last?.role === 'assistant' && !last?.is_streaming) setSending(false);
@@ -58,7 +58,7 @@ export default function ParentCoach() {
     setSending(true);
     setInput('');
     try {
-      await base44.agents.addMessage(conversation, { role: 'user', content: text.trim() });
+      await api.agents.addMessage(conversation, { role: 'user', content: text.trim() });
     } catch (e) {
       toast.error('Could not send message');
       setSending(false);

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import Shell from '@/components/Shell';
 import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
@@ -8,15 +8,15 @@ import AvatarRing from '@/components/AvatarRing';
 import { BADGE_CATALOG, tierStyle } from '@/lib/gamification';
 
 export default function KidBadges() {
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => api.auth.me() });
   const { data: owned = [] } = useQuery({
     queryKey: ['badges', me?.email],
-    queryFn: () => base44.entities.UserBadge.filter({ kid_email: me.email }),
+    queryFn: () => api.entities.UserBadge.filter({ kid_email: me.email }),
     enabled: !!me?.email,
   });
   const { data: approved = [] } = useQuery({
     queryKey: ['approvedCount', me?.email],
-    queryFn: () => base44.entities.ChoreClaim.filter({ kid_email: me.email, status: 'approved' }),
+    queryFn: () => api.entities.ChoreClaim.filter({ kid_email: me.email, status: 'approved' }),
     enabled: !!me?.email,
   });
 

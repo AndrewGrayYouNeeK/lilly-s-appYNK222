@@ -1,4 +1,4 @@
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 
 // 6 levels: Rookie → Hero → Legend
 export const LEVELS = [
@@ -41,9 +41,9 @@ export const tierStyle = (tier) => ({
 // Award any newly-earned badges based on kid stats. Returns array of newly awarded badges.
 export const checkAndAwardBadges = async ({ kidEmail, familyId }) => {
   const [approved, streakRows, owned] = await Promise.all([
-    base44.entities.ChoreClaim.filter({ kid_email: kidEmail, status: 'approved' }),
-    base44.entities.Streak.filter({ kid_email: kidEmail }),
-    base44.entities.UserBadge.filter({ kid_email: kidEmail }),
+    api.entities.ChoreClaim.filter({ kid_email: kidEmail, status: 'approved' }),
+    api.entities.Streak.filter({ kid_email: kidEmail }),
+    api.entities.UserBadge.filter({ kid_email: kidEmail }),
   ]);
   const stats = {
     approved: approved.length,
@@ -54,7 +54,7 @@ export const checkAndAwardBadges = async ({ kidEmail, familyId }) => {
   const newly = [];
   for (const b of BADGE_CATALOG) {
     if (!ownedKeys.has(b.key) && b.check(stats)) {
-      await base44.entities.UserBadge.create({
+      await api.entities.UserBadge.create({
         kid_email: kidEmail, family_id: familyId,
         badge_key: b.key, badge_title: b.title, badge_emoji: b.emoji, badge_tier: b.tier,
       });
@@ -66,13 +66,13 @@ export const checkAndAwardBadges = async ({ kidEmail, familyId }) => {
 
 // Check if a family quest is completed (based on total approved chores since quest created_date)
 export const checkFamilyQuests = async (familyId) => {
-  const quests = await base44.entities.FamilyQuest.filter({ family_id: familyId, status: 'active' });
+  const quests = await api.entities.FamilyQuest.filter({ family_id: familyId, status: 'active' });
   for (const q of quests) {
     const since = new Date(q.created_date);
-    const approved = await base44.entities.ChoreClaim.filter({ family_id: familyId, status: 'approved' });
+    const approved = await api.entities.ChoreClaim.filter({ family_id: familyId, status: 'approved' });
     const count = approved.filter(c => new Date(c.created_date) >= since).length;
     if (count >= q.target_count) {
-      await base44.entities.FamilyQuest.update(q.id, { status: 'completed' });
+      await api.entities.FamilyQuest.update(q.id, { status: 'completed' });
     }
   }
 };

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import Shell from '@/components/Shell';
 import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
@@ -19,15 +19,15 @@ export default function ParentCashouts() {
   const [method, setMethod] = useState({});
   const [note, setNote] = useState({});
 
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => api.auth.me() });
   const { data: family } = useQuery({
     queryKey: ['family', me?.family_id],
-    queryFn: () => base44.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
+    queryFn: () => api.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
     enabled: !!me?.family_id,
   });
   const { data: requests = [] } = useQuery({
     queryKey: ['parentCashouts', me?.family_id],
-    queryFn: () => base44.entities.CashoutRequest.filter({ family_id: me.family_id }, '-created_date'),
+    queryFn: () => api.entities.CashoutRequest.filter({ family_id: me.family_id }, '-created_date'),
     enabled: !!me?.family_id,
   });
 
@@ -38,7 +38,7 @@ export default function ParentCashouts() {
   const markPaid = useMutation({
     mutationFn: async (r) => {
       const pm = method[r.id] || 'Cash';
-      await base44.entities.CashoutRequest.update(r.id, {
+      await api.entities.CashoutRequest.update(r.id, {
         status: 'paid',
         payment_method: pm,
         parent_note: note[r.id] || undefined,
@@ -46,7 +46,7 @@ export default function ParentCashouts() {
         resolved_by: me.email,
       });
       // Deduct from kid's ledger
-      await base44.entities.WalletTransaction.create({
+      await api.entities.WalletTransaction.create({
         kid_email: r.kid_email,
         family_id: r.family_id,
         amount: r.amount,
@@ -72,7 +72,7 @@ export default function ParentCashouts() {
 
   const deny = useMutation({
     mutationFn: async (r) => {
-      await base44.entities.CashoutRequest.update(r.id, {
+      await api.entities.CashoutRequest.update(r.id, {
         status: 'denied',
         parent_note: note[r.id] || undefined,
         resolved_at: new Date().toISOString(),

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import Shell from '@/components/Shell';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,15 +17,15 @@ const EMOJIS = ['🧹','🛏️','🍽️','🗑️','🐕','🪴','🧺','📚'
 
 export default function ParentChores() {
   const qc = useQueryClient();
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => api.auth.me() });
   const { data: family } = useQuery({
     queryKey: ['family', me?.family_id],
-    queryFn: () => base44.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
+    queryFn: () => api.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
     enabled: !!me?.family_id,
   });
   const { data: chores = [] } = useQuery({
     queryKey: ['chores', me?.family_id],
-    queryFn: () => base44.entities.Chore.filter({ family_id: me.family_id }, '-created_date'),
+    queryFn: () => api.entities.Chore.filter({ family_id: me.family_id }, '-created_date'),
     enabled: !!me?.family_id,
   });
 
@@ -34,12 +34,12 @@ export default function ParentChores() {
   const [form, setForm] = useState({ title:'', description:'', value:'', difficulty:'easy', emoji:'🧹', requires_photo: true });
 
   const createChore = useMutation({
-    mutationFn: (data) => base44.entities.Chore.create({ ...data, family_id: me.family_id, active: true }),
+    mutationFn: (data) => api.entities.Chore.create({ ...data, family_id: me.family_id, active: true }),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['chores'] }); setShowForm(false); setForm({ title:'', description:'', value:'', difficulty:'easy', emoji:'🧹', requires_photo: true }); toast.success('Chore added!'); },
   });
 
   const removeChore = useMutation({
-    mutationFn: (id) => base44.entities.Chore.delete(id),
+    mutationFn: (id) => api.entities.Chore.delete(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['chores'] }),
   });
 
@@ -51,7 +51,7 @@ export default function ParentChores() {
   const aiSuggest = async () => {
     setAiLoading(true);
     try {
-      const res = await base44.integrations.Core.InvokeLLM({
+      const res = await api.integrations.Core.InvokeLLM({
         prompt: 'Suggest 5 age-appropriate household chores for kids 6-14. For each: short title (max 4 words), one-sentence description, suggested $ value (between 0.50 and 5.00), difficulty (easy/medium/hard), and a single emoji.',
         response_json_schema: {
           type: 'object',
@@ -73,7 +73,7 @@ export default function ParentChores() {
         },
       });
       for (const c of (res.chores || [])) {
-        await base44.entities.Chore.create({ ...c, family_id: me.family_id, active: true, recurrence: 'daily' });
+        await api.entities.Chore.create({ ...c, family_id: me.family_id, active: true, recurrence: 'daily' });
       }
       qc.invalidateQueries({ queryKey: ['chores'] });
       toast.success('Added 5 suggested chores!');

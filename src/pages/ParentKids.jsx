@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import Shell from '@/components/Shell';
 import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
@@ -14,20 +14,20 @@ const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 export default function ParentKids() {
   const qc = useQueryClient();
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => api.auth.me() });
   const { data: family } = useQuery({
     queryKey: ['family', me?.family_id],
-    queryFn: () => base44.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
+    queryFn: () => api.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
     enabled: !!me?.family_id,
   });
   const { data: kids = [] } = useQuery({
     queryKey: ['kids', me?.family_id],
-    queryFn: () => base44.entities.User.filter({ family_id: me.family_id, app_role: 'kid' }),
+    queryFn: () => api.entities.User.filter({ family_id: me.family_id, app_role: 'kid' }),
     enabled: !!me?.family_id,
   });
   const { data: allowances = [] } = useQuery({
     queryKey: ['allowances', me?.family_id],
-    queryFn: () => base44.entities.Allowance.filter({ family_id: me.family_id }),
+    queryFn: () => api.entities.Allowance.filter({ family_id: me.family_id }),
     enabled: !!me?.family_id,
   });
 
@@ -74,13 +74,13 @@ function KidCard({ kid, allowance, sym, familyId, onChanged }) {
     try {
       const amt = Number(amount);
       if (!amt || amt <= 0) {
-        if (allowance) await base44.entities.Allowance.delete(allowance.id);
+        if (allowance) await api.entities.Allowance.delete(allowance.id);
         toast.success('Allowance removed');
       } else if (allowance) {
-        await base44.entities.Allowance.update(allowance.id, { amount: amt, day_of_week: Number(day), active: true });
+        await api.entities.Allowance.update(allowance.id, { amount: amt, day_of_week: Number(day), active: true });
         toast.success('Updated');
       } else {
-        await base44.entities.Allowance.create({
+        await api.entities.Allowance.create({
           family_id: familyId,
           kid_email: kid.email,
           kid_name: kid.display_name || kid.full_name,
@@ -97,9 +97,9 @@ function KidCard({ kid, allowance, sym, familyId, onChanged }) {
 
   const removeKid = async () => {
     if (!confirm(`Remove ${kid.display_name || kid.full_name} from the family?`)) return;
-    await base44.auth.updateMe; // noop — we update the target kid via User entity
-    await base44.entities.User.update(kid.id, { family_id: null, app_role: null });
-    if (allowance) await base44.entities.Allowance.delete(allowance.id);
+    await api.auth.updateMe; // noop — we update the target kid via User entity
+    await api.entities.User.update(kid.id, { family_id: null, app_role: null });
+    if (allowance) await api.entities.Allowance.delete(allowance.id);
     toast.success('Removed');
     onChanged();
   };

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import Shell from '@/components/Shell';
 import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
@@ -15,15 +15,15 @@ const MILESTONES = [
 ];
 
 export default function KidStreak() {
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => api.auth.me() });
   const { data: streak } = useQuery({
     queryKey: ['streak', me?.email],
-    queryFn: () => base44.entities.Streak.filter({ kid_email: me.email }).then(r => r[0]),
+    queryFn: () => api.entities.Streak.filter({ kid_email: me.email }).then(r => r[0]),
     enabled: !!me?.email,
   });
   const { data: approved = [] } = useQuery({
     queryKey: ['approvedDates', me?.email],
-    queryFn: () => base44.entities.ChoreClaim.filter({ kid_email: me.email, status: 'approved' }),
+    queryFn: () => api.entities.ChoreClaim.filter({ kid_email: me.email, status: 'approved' }),
     enabled: !!me?.email,
   });
 

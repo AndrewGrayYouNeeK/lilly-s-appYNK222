@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import Shell from '@/components/Shell';
 import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
@@ -20,20 +20,20 @@ export default function KidCashout() {
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
 
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => api.auth.me() });
   const { data: family } = useQuery({
     queryKey: ['family', me?.family_id],
-    queryFn: () => base44.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
+    queryFn: () => api.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
     enabled: !!me?.family_id,
   });
   const { data: txs = [] } = useQuery({
     queryKey: ['txs', me?.email],
-    queryFn: () => base44.entities.WalletTransaction.filter({ kid_email: me.email }),
+    queryFn: () => api.entities.WalletTransaction.filter({ kid_email: me.email }),
     enabled: !!me?.email,
   });
   const { data: requests = [] } = useQuery({
     queryKey: ['cashouts', me?.email],
-    queryFn: () => base44.entities.CashoutRequest.filter({ kid_email: me.email }, '-created_date'),
+    queryFn: () => api.entities.CashoutRequest.filter({ kid_email: me.email }, '-created_date'),
     enabled: !!me?.email,
   });
 
@@ -48,7 +48,7 @@ export default function KidCashout() {
       const v = Math.round(Number(amount) * 100) / 100;
       if (!v || v <= 0) throw new Error('Enter an amount');
       if (v > available) throw new Error(`You only have ${formatMoney(available, sym)} available`);
-      const req = await base44.entities.CashoutRequest.create({
+      const req = await api.entities.CashoutRequest.create({
         family_id: me.family_id,
         kid_email: me.email,
         kid_name: me.display_name || me.full_name,

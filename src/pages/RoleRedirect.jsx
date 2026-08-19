@@ -1,19 +1,19 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 
 export default function RoleRedirect() {
   const nav = useNavigate();
   useEffect(() => {
     (async () => {
       try {
-        const me = await base44.auth.me();
-        if (!me) { base44.auth.redirectToLogin(); return; }
+        const me = await api.auth.me();
+        if (!me) { api.auth.redirectToLogin(); return; }
         if (me.app_role === 'parent') nav('/parent', { replace: true });
         else if (me.app_role === 'kid') nav('/kid', { replace: true });
         else nav('/onboarding', { replace: true });
       } catch {
-        base44.auth.redirectToLogin();
+        api.auth.redirectToLogin();
       }
     })();
   }, [nav]);

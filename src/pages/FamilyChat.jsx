@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import Shell from '@/components/Shell';
 import MessageBubble from '@/components/MessageBubble';
 import MessageComposer from '@/components/MessageComposer';
@@ -9,10 +9,10 @@ import { notifyParents, notify } from '@/lib/notify';
 export default function FamilyChat() {
   const qc = useQueryClient();
   const bottomRef = useRef(null);
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => api.auth.me() });
   const { data: messages = [] } = useQuery({
     queryKey: ['chat', me?.family_id],
-    queryFn: () => base44.entities.Message.filter({ family_id: me.family_id, scope: 'family' }, 'created_date', 100),
+    queryFn: () => api.entities.Message.filter({ family_id: me.family_id, scope: 'family' }, 'created_date', 100),
     enabled: !!me?.family_id,
     refetchInterval: 8000,
   });
@@ -23,7 +23,7 @@ export default function FamilyChat() {
 
   const send = useMutation({
     mutationFn: async (text) => {
-      await base44.entities.Message.create({
+      await api.entities.Message.create({
         family_id: me.family_id,
         author_email: me.email,
         author_name: me.display_name || me.full_name,
@@ -39,7 +39,7 @@ export default function FamilyChat() {
       if (me.app_role === 'kid') {
         await notifyParents({ family_id: me.family_id, type: 'message', title, emoji: '💬', link });
       } else {
-        const kids = await base44.entities.User.filter({ family_id: me.family_id, app_role: 'kid' });
+        const kids = await api.entities.User.filter({ family_id: me.family_id, app_role: 'kid' });
         await Promise.all(kids.map(k => notify({
           recipient_email: k.email, family_id: me.family_id, type: 'message', title, emoji: '💬', link,
         })));

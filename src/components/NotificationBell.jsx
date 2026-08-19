@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import { Bell } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { formatDistanceToNow } from 'date-fns';
@@ -13,7 +13,7 @@ export default function NotificationBell({ email }) {
 
   const { data: items = [] } = useQuery({
     queryKey: ['notifs', email],
-    queryFn: () => base44.entities.Notification.filter({ recipient_email: email }, '-created_date', 30),
+    queryFn: () => api.entities.Notification.filter({ recipient_email: email }, '-created_date', 30),
     enabled: !!email,
     refetchInterval: 20000,
   });
@@ -22,13 +22,13 @@ export default function NotificationBell({ email }) {
 
   const markAll = useMutation({
     mutationFn: async () => {
-      await Promise.all(items.filter(n => !n.read).map(n => base44.entities.Notification.update(n.id, { read: true })));
+      await Promise.all(items.filter(n => !n.read).map(n => api.entities.Notification.update(n.id, { read: true })));
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['notifs'] }),
   });
 
   const handleClick = async (n) => {
-    if (!n.read) await base44.entities.Notification.update(n.id, { read: true });
+    if (!n.read) await api.entities.Notification.update(n.id, { read: true });
     qc.invalidateQueries({ queryKey: ['notifs'] });
     setOpen(false);
     if (n.link) nav(n.link);

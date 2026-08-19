@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import MessageBubble from '@/components/MessageBubble';
 import MessageComposer from '@/components/MessageComposer';
 import { notify, notifyParents } from '@/lib/notify';
@@ -12,13 +12,13 @@ export default function ClaimCommentThread({ claim, me }) {
 
   const { data: messages = [] } = useQuery({
     queryKey: key,
-    queryFn: () => base44.entities.Message.filter({ claim_id: claim.id, scope: 'claim' }, 'created_date', 50),
+    queryFn: () => api.entities.Message.filter({ claim_id: claim.id, scope: 'claim' }, 'created_date', 50),
     refetchInterval: 15000,
   });
 
   const send = useMutation({
     mutationFn: async (text) => {
-      await base44.entities.Message.create({
+      await api.entities.Message.create({
         family_id: claim.family_id,
         author_email: me.email,
         author_name: me.display_name || me.full_name,

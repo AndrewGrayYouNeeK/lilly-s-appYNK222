@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import Shell from '@/components/Shell';
 import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
@@ -17,11 +17,11 @@ export default function Settings() {
   const nav = useNavigate();
   const [deleting, setDeleting] = useState(false);
 
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => api.auth.me() });
   const isParent = me?.app_role === 'parent';
 
   const handleLogout = async () => {
-    await base44.auth.logout();
+    await api.auth.logout();
   };
 
   const handleDeleteAccount = async () => {
@@ -30,16 +30,16 @@ export default function Settings() {
     try {
       // Wipe the user's own data (entities they own).
       const wipers = [
-        () => base44.entities.WalletTransaction.filter({ kid_email: me.email }).then(rs => Promise.all(rs.map(r => base44.entities.WalletTransaction.delete(r.id)))),
-        () => base44.entities.ChoreClaim.filter({ kid_email: me.email }).then(rs => Promise.all(rs.map(r => base44.entities.ChoreClaim.delete(r.id)))),
-        () => base44.entities.Notification.filter({ recipient_email: me.email }).then(rs => Promise.all(rs.map(r => base44.entities.Notification.delete(r.id)))),
-        () => base44.entities.SavingsGoal.filter({ kid_email: me.email }).then(rs => Promise.all(rs.map(r => base44.entities.SavingsGoal.delete(r.id)))),
-        () => base44.entities.CashoutRequest.filter({ kid_email: me.email }).then(rs => Promise.all(rs.map(r => base44.entities.CashoutRequest.delete(r.id)))),
+        () => api.entities.WalletTransaction.filter({ kid_email: me.email }).then(rs => Promise.all(rs.map(r => api.entities.WalletTransaction.delete(r.id)))),
+        () => api.entities.ChoreClaim.filter({ kid_email: me.email }).then(rs => Promise.all(rs.map(r => api.entities.ChoreClaim.delete(r.id)))),
+        () => api.entities.Notification.filter({ recipient_email: me.email }).then(rs => Promise.all(rs.map(r => api.entities.Notification.delete(r.id)))),
+        () => api.entities.SavingsGoal.filter({ kid_email: me.email }).then(rs => Promise.all(rs.map(r => api.entities.SavingsGoal.delete(r.id)))),
+        () => api.entities.CashoutRequest.filter({ kid_email: me.email }).then(rs => Promise.all(rs.map(r => api.entities.CashoutRequest.delete(r.id)))),
       ];
       await Promise.allSettled(wipers.map(fn => fn()));
 
       // Clear user's profile fields so re-login starts fresh
-      await base44.auth.updateMe({
+      await api.auth.updateMe({
         family_id: null,
         app_role: null,
         display_name: null,
@@ -48,7 +48,7 @@ export default function Settings() {
       });
 
       toast.success('Account data cleared. Logging you out…');
-      setTimeout(() => base44.auth.logout(), 1200);
+      setTimeout(() => api.auth.logout(), 1200);
     } catch (e) {
       toast.error('Could not delete account. Please contact support.');
       setDeleting(false);

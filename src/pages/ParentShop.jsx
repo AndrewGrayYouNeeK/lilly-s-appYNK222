@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 import Shell from '@/components/Shell';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,20 +14,20 @@ const EMOJIS = ['🎁','🍦','🎮','📱','🎬','🍕','⚽','🎨','📚','�
 
 export default function ParentShop() {
   const qc = useQueryClient();
-  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => base44.auth.me() });
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => api.auth.me() });
   const { data: family } = useQuery({
     queryKey: ['family', me?.family_id],
-    queryFn: () => base44.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
+    queryFn: () => api.entities.Family.filter({ id: me.family_id }).then(r => r[0]),
     enabled: !!me?.family_id,
   });
   const { data: items = [] } = useQuery({
     queryKey: ['shopAll', me?.family_id],
-    queryFn: () => base44.entities.ShopItem.filter({ family_id: me.family_id }),
+    queryFn: () => api.entities.ShopItem.filter({ family_id: me.family_id }),
     enabled: !!me?.family_id,
   });
   const { data: purchases = [] } = useQuery({
     queryKey: ['purchasesAll', me?.family_id],
-    queryFn: () => base44.entities.Purchase.filter({ family_id: me.family_id }, '-created_date'),
+    queryFn: () => api.entities.Purchase.filter({ family_id: me.family_id }, '-created_date'),
     enabled: !!me?.family_id,
   });
 
@@ -35,15 +35,15 @@ export default function ParentShop() {
   const [show, setShow] = useState(false);
 
   const add = useMutation({
-    mutationFn: (d) => base44.entities.ShopItem.create({ ...d, family_id: me.family_id, active: true, kind: 'real' }),
+    mutationFn: (d) => api.entities.ShopItem.create({ ...d, family_id: me.family_id, active: true, kind: 'real' }),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['shopAll'] }); setShow(false); setForm({ title:'', description:'', price:'', emoji:'🎁' }); toast.success('Reward added'); },
   });
   const del = useMutation({
-    mutationFn: (id) => base44.entities.ShopItem.delete(id),
+    mutationFn: (id) => api.entities.ShopItem.delete(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['shopAll'] }),
   });
   const fulfill = useMutation({
-    mutationFn: (id) => base44.entities.Purchase.update(id, { status: 'fulfilled' }),
+    mutationFn: (id) => api.entities.Purchase.update(id, { status: 'fulfilled' }),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['purchasesAll'] }); toast.success('Marked fulfilled'); },
   });
 

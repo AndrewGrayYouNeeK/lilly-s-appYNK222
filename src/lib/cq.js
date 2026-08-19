@@ -1,5 +1,5 @@
 // ChoreQuest shared helpers
-import { base44 } from '@/api/base44Client';
+import { api } from '@/api/apiClient';
 
 export const genInviteCode = () => {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -22,7 +22,7 @@ export const streakMultiplier = (count) => {
 };
 
 export const fetchMe = async () => {
-  try { return await base44.auth.me(); } catch { return null; }
+  try { return await api.auth.me(); } catch { return null; }
 };
 
 export const formatMoney = (amount, symbol = '$') =>

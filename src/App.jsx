@@ -35,6 +35,7 @@ const ParentFunds = lazy(() => import('@/pages/ParentFunds'));
 const ParentCashouts = lazy(() => import('@/pages/ParentCashouts'));
 const KidCashout = lazy(() => import('@/pages/KidCashout'));
 const Settings = lazy(() => import('@/pages/Settings'));
+const Login = lazy(() => import('@/pages/Login'));
 
 const RouteFallback = () => (
   <div className="fixed inset-0 flex items-center justify-center">
@@ -83,8 +84,19 @@ const AnimatedRoutes = () => {
 };
 
 const AuthenticatedApp = () => {
+  const location = useLocation();
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
   useSystemDarkMode();
+
+  if (location.pathname === '/login') {
+    return (
+      <Suspense fallback={<RouteFallback />}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </Suspense>
+    );
+  }
 
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
