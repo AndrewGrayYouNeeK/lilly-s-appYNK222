@@ -1,4 +1,4 @@
--- Lilly's App (ChoreQuest) — initial schema migrated from Base44 entities
+-- Lilly's App (ChoreQuest) — initial schema
 
 create extension if not exists "pgcrypto";
 
